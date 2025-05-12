@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Auth Service" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/auth-service/.env" />
+    </option>
+    <option name="MAIN_CLASS_NAME" value="eu.deltasw.auth_service.AuthServiceApplication" />
+    <module name="auth-service" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

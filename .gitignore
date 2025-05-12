@@ -2,3 +2,6 @@
 /eureka/target/
 /gateway/target/
 /movie-service/target/
+/auth-service/.env
+/gateway/.env
+/movie-service/.env

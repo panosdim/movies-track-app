@@ -1,6 +1,6 @@
-package eu.deltasw.movie_service.component;
+package eu.deltasw.tmdb_service.component;
 
-import eu.deltasw.movie_service.repository.MovieRepository;
+import eu.deltasw.tmdb_service.repository.MovieRepository;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 import info.movito.themoviedbapi.tools.TmdbException;
@@ -23,7 +23,6 @@ public class WatchProviderInfo {
     }
 
     @Scheduled(cron = "0 0 1 * * *")
-    @Scheduled(fixedRate = 10000) // every 10 seconds
     public void updateWatchProvidersInfo() {
         logger.info("Updating watch providers info...");
 
@@ -39,6 +38,5 @@ public class WatchProviderInfo {
                 logger.error("Error getting watch providers", e);
             }
         });
-
     }
 }

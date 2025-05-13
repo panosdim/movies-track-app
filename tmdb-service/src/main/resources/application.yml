@@ -2,7 +2,7 @@ server:
   port: 0
 spring:
   application:
-    name: movie-service
+    name: tmdb-service
   datasource:
     url: ${DB_URL}
     username: ${DB_USER}
@@ -17,11 +17,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS}
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: tmdb-movie-event-consumers
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.add.type.headers: true
+        spring.json.trusted.packages: "eu.deltasw.common.events.model"
 # Topic name
 movie:
   events:
@@ -38,3 +39,5 @@ eureka:
     prefer-ip-address: true
 jwt:
   secret: ${JWT_SECRET}
+tmdb:
+  key: ${TMDB_KEY}

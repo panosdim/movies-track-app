@@ -9,8 +9,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="auth-service" />
         <module name="movie-service" />
+        <module name="tmdb-service" />
         <module name="gateway" />
         <module name="eureka" />
+        <module name="common-events" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

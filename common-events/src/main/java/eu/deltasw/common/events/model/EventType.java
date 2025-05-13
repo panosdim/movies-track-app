@@ -1,10 +1,10 @@
-package eu.deltasw.movie_service.model;
+package eu.deltasw.common.events.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum EventType {
     ADD,
-    UPDATE,
+    RATE,
     DELETE;
 
     @JsonValue

@@ -5,3 +5,6 @@
 /auth-service/.env
 /gateway/.env
 /movie-service/.env
+/tmdb-service/.env
+/common-events/target/
+/tmdb-service/target/

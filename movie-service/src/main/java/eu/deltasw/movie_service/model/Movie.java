@@ -1,13 +1,13 @@
 package eu.deltasw.movie_service.model;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
-import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
 @Entity
 @Data
@@ -24,9 +24,6 @@ public class Movie {
     private Integer movieId;
     private String title;
     private String poster;
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private WatchProviders watchProviders;
     private Boolean watched;
     private Integer rating;
 }

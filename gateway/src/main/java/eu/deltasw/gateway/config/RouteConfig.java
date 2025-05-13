@@ -21,8 +21,12 @@ public class RouteConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 // Open endpoints (auth)
-                .route("auth_service", r -> r.path("/auth/**")
+                .route("auth_service", r -> r.path("/login", "/register")
                         .uri("lb://auth-service"))
+
+                // Open endpoints (tmdb)
+                .route("tmdb_service", r -> r.path("/popular")
+                        .uri("lb://tmdb-service"))
 
                 // Secured endpoints (movies)
                 .route("movie_service", r -> r.path("/movies/**")

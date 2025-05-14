@@ -12,10 +12,12 @@
         <option value="$PROJECT_DIR$/release-info-service/pom.xml" />
         <option value="$PROJECT_DIR$/tmdb-service/pom.xml" />
         <option value="$PROJECT_DIR$/common-events/pom.xml" />
+        <option value="$PROJECT_DIR$/common/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/common-events/pom.xml" />
         <option value="$PROJECT_DIR$/movies/pom.xml" />
         <option value="$PROJECT_DIR$/release-info-service/pom.xml" />
       </set>

@@ -7,6 +7,7 @@ import eu.deltasw.auth_service.model.dto.RegistrationRequest;
 import eu.deltasw.auth_service.model.entity.User;
 import eu.deltasw.auth_service.repository.UserRepository;
 import eu.deltasw.auth_service.security.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +27,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
-        if (request.getEmail() == null || request.getPassword() == null || request.getFirstName() == null || request.getLastName() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Missing required fields"));
-        }
-
+    public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request) {
+        // Check if a user already exists
         Optional<User> existing = userRepository.findByEmail(request.getEmail());
         if (existing.isPresent()) {
             return ResponseEntity.badRequest().body(new ErrorResponse("User already exists"));
@@ -48,10 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        if (request.getEmail() == null || request.getPassword() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Missing required fields"));
-        }
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
         if (userOpt.isPresent() && passwordEncoder.matches(request.getPassword(), userOpt.get().getPassword())) {
             String token = jwtUtil.generateToken(request.getEmail());

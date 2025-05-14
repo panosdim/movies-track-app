@@ -7,16 +7,14 @@ import eu.deltasw.tmdb_service.repository.MovieRepository;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 import info.movito.themoviedbapi.tools.TmdbException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MovieEventsConsumer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovieEventsConsumer.class);
-
     private final MovieRepository repository;
     private final TmdbApi tmdb;
 
@@ -31,26 +29,33 @@ public class MovieEventsConsumer {
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void consumeMovieEvent(MovieEvent event) {
-        LOGGER.info("Received movie event: {}", event.toString());
+        log.info("Received movie event: {}", event.toString());
 
         switch (event.getEventType()) {
             case EventType.ADD:
-                LOGGER.info("Processing MOVIE_ADDED for movieId: {}", event.getMovieId());
-                Movie movie = new Movie();
-                movie.setMovieId(event.getMovieId());
+                log.info("Processing MOVIE_ADDED for movieId: {}", event.getMovieId());
+
+                Movie movie = repository.findByMovieId(event.getMovieId())
+                        .orElseGet(() -> {
+                            Movie newMovie = new Movie();
+                            newMovie.setMovieId(event.getMovieId());
+                            return newMovie;
+                        });
+
                 try {
                     WatchProviders watchProviders = tmdb.getMovies().getWatchProviders(movie.getMovieId())
                             .getResults().get("GR");
                     movie.setWatchProviders(watchProviders);
-                    repository.save(movie);
                 } catch (TmdbException e) {
-                    LOGGER.error("Error getting watch providers", e);
+                    log.error("Error getting watch providers", e);
                 }
+
+                repository.save(movie);
                 break;
             case EventType.RATE, EventType.DELETE:
                 break;
             default:
-                LOGGER.warn("Received unknown event type: {}", event.getEventType());
+                log.warn("Received unknown event type: {}", event.getEventType());
         }
     }
 }

@@ -3,21 +3,21 @@ package eu.deltasw.movie_service.controller;
 
 import eu.deltasw.common.events.model.EventType;
 import eu.deltasw.movie_service.model.Movie;
+import eu.deltasw.movie_service.model.dto.AddMovieRequest;
 import eu.deltasw.movie_service.model.dto.ErrorResponse;
 import eu.deltasw.movie_service.model.dto.RateRequest;
 import eu.deltasw.movie_service.repository.MovieRepository;
 import eu.deltasw.movie_service.security.JwtUtil;
 import eu.deltasw.movie_service.service.MovieEventProducer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/movies")
+@Slf4j
 public class MovieController {
-    private static final Logger logger = LoggerFactory.getLogger(MovieController.class);
-
 
     private final MovieRepository repository;
     private final JwtUtil jwtUtil;
@@ -42,7 +42,7 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String authHeader, @RequestBody Movie movie) {
+    public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody AddMovieRequest addMovie) {
         String token = authHeader.replace("Bearer ", "");
         String userId = jwtUtil.extractUserId(token);
 
@@ -50,11 +50,13 @@ public class MovieController {
         if (userId == null) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot extract email from JWT"));
         }
-        if (movie.getMovieId() == null || movie.getTitle() == null || movie.getPoster() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Missing required fields"));
-        }
 
-        movie.setUserId(userId);
+        Movie movie = Movie.builder()
+                .movieId(addMovie.getMovieId())
+                .title(addMovie.getTitle())
+                .poster(addMovie.getPoster())
+                .userId(userId)
+                .build();
 
         Movie savedMovie = repository.save(movie);
         movieEventProducer.sendMovieEvent(savedMovie, EventType.ADD);
@@ -83,17 +85,13 @@ public class MovieController {
 
     @PostMapping("/{id}/rate")
     public ResponseEntity<?> setRating(@RequestHeader("Authorization") String authHeader,
-                                       @PathVariable("id") Long id, @RequestBody RateRequest rateRequest) {
+                                       @PathVariable("id") Long id, @Valid @RequestBody RateRequest rateRequest) {
         String token = authHeader.replace("Bearer ", "");
         String userId = jwtUtil.extractUserId(token);
 
         // Validation
         if (userId == null) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot extract email from JWT"));
-        }
-
-        if (rateRequest.getRating() == null || rateRequest.getRating() < 1 || rateRequest.getRating() > 5) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Rating must be between 1 and 5"));
         }
 
         return repository.findById(id)

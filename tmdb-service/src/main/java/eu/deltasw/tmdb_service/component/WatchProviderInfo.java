@@ -4,16 +4,14 @@ import eu.deltasw.tmdb_service.repository.MovieRepository;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 import info.movito.themoviedbapi.tools.TmdbException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WatchProviderInfo {
-    private static final Logger logger = LoggerFactory.getLogger(WatchProviderInfo.class);
-
     private final MovieRepository repository;
     private final TmdbApi tmdb;
 
@@ -24,7 +22,7 @@ public class WatchProviderInfo {
 
     @Scheduled(cron = "0 0 1 * * *")
     public void updateWatchProvidersInfo() {
-        logger.info("Updating watch providers info...");
+        log.info("Updating watch providers info...");
 
         repository.findAll().forEach(movie -> {
             try {
@@ -35,7 +33,7 @@ public class WatchProviderInfo {
                     repository.save(movie);
                 }
             } catch (TmdbException e) {
-                logger.error("Error getting watch providers", e);
+                log.error("Error getting watch providers", e);
             }
         });
     }

@@ -2,12 +2,12 @@ package eu.deltasw.movie_service.controller;
 
 
 import eu.deltasw.common.events.model.EventType;
+import eu.deltasw.common.util.RequestContext;
 import eu.deltasw.movie_service.model.Movie;
 import eu.deltasw.movie_service.model.dto.AddMovieRequest;
 import eu.deltasw.movie_service.model.dto.ErrorResponse;
 import eu.deltasw.movie_service.model.dto.RateRequest;
 import eu.deltasw.movie_service.repository.MovieRepository;
-import eu.deltasw.movie_service.security.JwtUtil;
 import eu.deltasw.movie_service.service.MovieEventProducer;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +20,17 @@ import org.springframework.web.bind.annotation.*;
 public class MovieController {
 
     private final MovieRepository repository;
-    private final JwtUtil jwtUtil;
     private final MovieEventProducer movieEventProducer;
 
-    public MovieController(MovieRepository repository, JwtUtil jwtUtil, MovieEventProducer movieEventProducer) {
+    public MovieController(MovieRepository repository, MovieEventProducer movieEventProducer) {
         this.repository = repository;
-        this.jwtUtil = jwtUtil;
         this.movieEventProducer = movieEventProducer;
     }
 
     @GetMapping
-    public ResponseEntity<?> getMovies(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
+    public ResponseEntity<?> getMovies() {
+        String userId = RequestContext.getCurrentUserId();
+
         // Validation
         if (userId == null) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot extract email from JWT"));
@@ -42,9 +40,8 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addMovie(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody AddMovieRequest addMovie) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
+    public ResponseEntity<?> addMovie(@Valid @RequestBody AddMovieRequest addMovie) {
+        String userId = RequestContext.getCurrentUserId();
 
         // Validation
         if (userId == null) {
@@ -64,10 +61,8 @@ public class MovieController {
     }
 
     @PostMapping("/{id}/watched")
-    public ResponseEntity<?> setWatched(@RequestHeader("Authorization") String authHeader,
-                                        @PathVariable("id") Long id) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
+    public ResponseEntity<?> setWatched(@PathVariable("id") Long id) {
+        String userId = RequestContext.getCurrentUserId();
 
         // Validation
         if (userId == null) {
@@ -84,10 +79,8 @@ public class MovieController {
     }
 
     @PostMapping("/{id}/rate")
-    public ResponseEntity<?> setRating(@RequestHeader("Authorization") String authHeader,
-                                       @PathVariable("id") Long id, @Valid @RequestBody RateRequest rateRequest) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
+    public ResponseEntity<?> setRating(@PathVariable("id") Long id, @Valid @RequestBody RateRequest rateRequest) {
+        String userId = RequestContext.getCurrentUserId();
 
         // Validation
         if (userId == null) {
@@ -105,9 +98,8 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMovie(@RequestHeader("Authorization") String authHeader, @PathVariable("id") Long id) {
-        String token = authHeader.replace("Bearer ", "");
-        String userId = jwtUtil.extractUserId(token);
+    public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id) {
+        String userId = RequestContext.getCurrentUserId();
 
         // Validation
         if (userId == null) {

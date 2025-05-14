@@ -6,7 +6,7 @@ import eu.deltasw.auth_service.model.dto.ErrorResponse;
 import eu.deltasw.auth_service.model.dto.RegistrationRequest;
 import eu.deltasw.auth_service.model.entity.User;
 import eu.deltasw.auth_service.repository.UserRepository;
-import eu.deltasw.auth_service.security.JwtUtil;
+import eu.deltasw.common.security.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

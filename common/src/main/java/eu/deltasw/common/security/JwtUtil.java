@@ -1,14 +1,15 @@
 package eu.deltasw.common.security;
 
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
 import eu.deltasw.common.security.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
 
 public class JwtUtil {
     private final SecretKey key;

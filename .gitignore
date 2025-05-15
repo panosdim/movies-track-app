@@ -1,2 +1,4 @@
 # Project exclude paths
 **/.env
+*~
+.vscode/launch.json

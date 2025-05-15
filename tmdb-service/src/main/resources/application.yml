@@ -22,7 +22,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "eu.deltasw.common.events.model"
+        "[spring.json.trusted.packages]": "eu.deltasw.common.events.model"
 # Topic name
 movie:
   events:

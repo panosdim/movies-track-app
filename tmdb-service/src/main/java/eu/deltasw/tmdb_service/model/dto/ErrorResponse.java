@@ -1,4 +1,4 @@
-package eu.deltasw.tmdb_service.model;
+package eu.deltasw.tmdb_service.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

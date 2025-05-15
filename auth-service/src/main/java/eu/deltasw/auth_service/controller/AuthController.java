@@ -1,5 +1,14 @@
 package eu.deltasw.auth_service.controller;
 
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import eu.deltasw.auth_service.model.dto.AuthRequest;
 import eu.deltasw.auth_service.model.dto.AuthResponse;
 import eu.deltasw.auth_service.model.dto.ErrorResponse;
@@ -9,14 +18,6 @@ import eu.deltasw.auth_service.repository.UserRepository;
 import eu.deltasw.common.security.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,10 +51,10 @@ public class AuthController {
         Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
         if (userOpt.isPresent() && passwordEncoder.matches(request.getPassword(), userOpt.get().getPassword())) {
             String token = jwtUtil.generateToken(request.getEmail());
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity
+                    .ok(new AuthResponse(token, userOpt.get().getFirstName(), userOpt.get().getLastName()));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 }
-

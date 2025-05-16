@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByUserId(String userId);
+
+    List<Movie> findByUserIdAndWatchedIsFalseOrWatchedIsNull(String userId);
 }
 

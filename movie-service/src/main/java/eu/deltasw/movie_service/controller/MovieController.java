@@ -39,6 +39,18 @@ public class MovieController {
         return ResponseEntity.ok(repository.findByUserId(userId));
     }
 
+    @GetMapping("/watchlist")
+    public ResponseEntity<?> getWatchlist() {
+        String userId = RequestContext.getCurrentUserId();
+
+        // Validation
+        if (userId == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Cannot extract email from JWT"));
+        }
+
+        return ResponseEntity.ok(repository.findByUserIdAndWatchedIsFalseOrWatchedIsNull(userId));
+    }
+
     @PostMapping
     public ResponseEntity<?> addMovie(@Valid @RequestBody AddMovieRequest addMovie) {
         String userId = RequestContext.getCurrentUserId();
@@ -60,7 +72,7 @@ public class MovieController {
         return ResponseEntity.ok(savedMovie);
     }
 
-    @PostMapping("/{id}/watched")
+    @PostMapping("/watched/{id}")
     public ResponseEntity<?> setWatched(@PathVariable("id") Long id) {
         String userId = RequestContext.getCurrentUserId();
 
@@ -78,7 +90,7 @@ public class MovieController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{id}/rate")
+    @PostMapping("/rate/{id}")
     public ResponseEntity<?> setRating(@PathVariable("id") Long id, @Valid @RequestBody RateRequest rateRequest) {
         String userId = RequestContext.getCurrentUserId();
 

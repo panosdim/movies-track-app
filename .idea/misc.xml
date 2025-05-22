@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="6">
-      <item index="0" class="java.lang.String" itemvalue="org.springframework.kafka.annotation.KafkaListener" />
-      <item index="1" class="java.lang.String" itemvalue="org.springframework.scheduling.annotation.Scheduled" />
-      <item index="2" class="java.lang.String" itemvalue="org.springframework.stereotype.Component" />
-      <item index="3" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.DeleteMapping" />
-      <item index="4" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.GetMapping" />
-      <item index="5" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.PostMapping" />
+    <list size="7">
+      <item index="0" class="java.lang.String" itemvalue="org.springframework.context.annotation.Bean" />
+      <item index="1" class="java.lang.String" itemvalue="org.springframework.kafka.annotation.KafkaListener" />
+      <item index="2" class="java.lang.String" itemvalue="org.springframework.scheduling.annotation.Scheduled" />
+      <item index="3" class="java.lang.String" itemvalue="org.springframework.stereotype.Component" />
+      <item index="4" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.DeleteMapping" />
+      <item index="5" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.GetMapping" />
+      <item index="6" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.PostMapping" />
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />

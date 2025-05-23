@@ -24,6 +24,7 @@
         <option value="$PROJECT_DIR$/tmdb-service/pom.xml" />
         <option value="$PROJECT_DIR$/common-events/pom.xml" />
         <option value="$PROJECT_DIR$/common/pom.xml" />
+        <option value="$PROJECT_DIR$/config-server/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

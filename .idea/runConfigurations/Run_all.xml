@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run all" type="CompoundRunConfigurationType">
     <toRun name="Run Auth Service" type="Application" />
+    <toRun name="Run Config Server" type="Application" />
     <toRun name="Run Eureka" type="Application" />
     <toRun name="Run Gateway" type="Application" />
     <toRun name="Run Movie Service" type="Application" />

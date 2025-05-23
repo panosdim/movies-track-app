@@ -1,50 +1,140 @@
 services:
-  broker:
-    image: apache/kafka-native:4.0.0
-    container_name: broker
-    ports:
-      - "9092:9092"
-      - "29092:29092"
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT_HOST://0.0.0.0:9092,PLAINTEXT_DOCKER://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://localhost:9092,PLAINTEXT_DOCKER://broker:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_DOCKER
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_NUM_PARTITIONS: 1
-      KAFKA_LOG_DIRS: /var/lib/kafka/data
-    volumes:
-      - kafka-data:/var/lib/kafka/data
-    networks:
-      - kafka-net
+    broker:
+        image: apache/kafka-native:4.0.0
+        container_name: broker
+        ports:
+            - '9092:9092'
+            - '29092:29092'
+        environment:
+            KAFKA_NODE_ID: 1
+            KAFKA_PROCESS_ROLES: broker,controller
+            KAFKA_LISTENERS: PLAINTEXT_HOST://0.0.0.0:9092,PLAINTEXT_DOCKER://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT_HOST://localhost:9092,PLAINTEXT_DOCKER://broker:29092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,PLAINTEXT_DOCKER:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_DOCKER
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+            KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:9093
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_NUM_PARTITIONS: 1
+            KAFKA_LOG_DIRS: /var/lib/kafka/data
+        volumes:
+            - kafka-data:/var/lib/kafka/data
+        networks:
+            - kafka-net
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
-    depends_on:
-      - broker
-    ports:
-      - "9080:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
-      KAFKA_CLUSTERS_0_METRICS_PORT: 9997
-      AUTH_TYPE: "LOGIN_FORM"
-      SPRING_SECURITY_USER_NAME: ${KAFKA_UI_USERNAME}
-      SPRING_SECURITY_USER_PASSWORD: ${KAFKA_UI_PASSWORD}
-    restart: unless-stopped
-    networks:
-      - kafka-net
+    kafka-ui:
+        image: provectuslabs/kafka-ui:latest
+        container_name: kafka-ui
+        depends_on:
+            - broker
+        ports:
+            - '9080:8080'
+        env_file:
+            - .env
+        environment:
+            KAFKA_CLUSTERS_0_NAME: local
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
+            KAFKA_CLUSTERS_0_METRICS_PORT: 9997
+            AUTH_TYPE: 'LOGIN_FORM'
+            SPRING_SECURITY_USER_NAME: ${KAFKA_UI_USERNAME}
+            SPRING_SECURITY_USER_PASSWORD: ${KAFKA_UI_PASSWORD}
+        restart: unless-stopped
+        networks:
+            - kafka-net
+
+    config-server:
+        build: ./config-server
+        container_name: config-server
+        depends_on:
+            - broker
+        env_file:
+            - .env
+        networks:
+            - kafka-net
+
+    eureka:
+        build: ./eureka
+        container_name: eureka
+        ports:
+            - '8761:8761'
+        depends_on:
+            - config-server
+        networks:
+            - kafka-net
+
+    gateway:
+        build: ./gateway
+        container_name: gateway
+        ports:
+            - '8080:8080'
+        depends_on:
+            - eureka
+            - config-server
+        networks:
+            - kafka-net
+
+    auth-service:
+        build: ./auth-service
+        container_name: auth-service
+        depends_on:
+            - eureka
+            - config-server
+        networks:
+            - kafka-net
+
+    movie-service:
+        build: ./movie-service
+        container_name: movie-service
+        depends_on:
+            - eureka
+            - config-server
+        networks:
+            - kafka-net
+
+    tmdb-service:
+        build: ./tmdb-service
+        container_name: tmdb-service
+        depends_on:
+            - eureka
+            - config-server
+        networks:
+            - kafka-net
+
+    postgresql:
+        image: postgres:16-alpine
+        container_name: postgresql
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - '5432:5432'
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+            - ./init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh:ro
+        networks:
+            - kafka-net
+
+    pgadmin:
+        image: dpage/pgadmin4:9.3.0
+        container_name: pgadmin
+        env_file:
+            - .env
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+            PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+        ports:
+            - '5050:80'
+        depends_on:
+            - postgresql
+        networks:
+            - kafka-net
 
 networks:
-  kafka-net:
+    kafka-net:
 
 volumes:
-  kafka-data:
+    kafka-data:
+    pgdata:

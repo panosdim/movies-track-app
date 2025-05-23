@@ -1,5 +1,13 @@
 package eu.deltasw.movie_service.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import eu.deltasw.common.events.model.EventType;
 import eu.deltasw.common.util.RequestContext;
@@ -11,8 +19,6 @@ import eu.deltasw.movie_service.repository.MovieRepository;
 import eu.deltasw.movie_service.service.MovieEventProducer;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/movies")
@@ -27,8 +33,8 @@ public class MovieController {
         this.movieEventProducer = movieEventProducer;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getMovies() {
+    @GetMapping("/watched")
+    public ResponseEntity<?> getWatchedMovies() {
         String userId = RequestContext.getCurrentUserId();
 
         // Validation
@@ -36,7 +42,7 @@ public class MovieController {
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot extract email from JWT"));
         }
 
-        return ResponseEntity.ok(repository.findByUserId(userId));
+        return ResponseEntity.ok(repository.findByUserIdAndWatchedIsTrue(userId));
     }
 
     @GetMapping("/watchlist")
@@ -128,4 +134,3 @@ public class MovieController {
                 .orElse(ResponseEntity.notFound().build());
     }
 }
-

@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    @SuppressWarnings("java:67109781") // Suppress warning for @NonNull
+    @SuppressWarnings({ "java:67109781", "null" }) // Suppress warning for @NonNull
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         log.debug("Processing request: {} {}", request.getMethod(), request.getRequestURI());

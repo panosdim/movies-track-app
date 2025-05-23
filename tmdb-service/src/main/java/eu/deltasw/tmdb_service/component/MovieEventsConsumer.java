@@ -1,5 +1,9 @@
 package eu.deltasw.tmdb_service.component;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
 import eu.deltasw.common.events.model.EventType;
 import eu.deltasw.common.events.model.MovieEvent;
 import eu.deltasw.tmdb_service.model.Movie;
@@ -8,9 +12,6 @@ import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 import info.movito.themoviedbapi.tools.TmdbException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -23,11 +24,7 @@ public class MovieEventsConsumer {
         tmdb = new TmdbApi(tmdbKey);
     }
 
-    @KafkaListener(
-            topics = "movie-events",
-            groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "kafkaListenerContainerFactory"
-    )
+    @KafkaListener(topics = "movie-events", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void consumeMovieEvent(MovieEvent event) {
         log.info("Received movie event: {}", event.toString());
 
@@ -43,6 +40,7 @@ public class MovieEventsConsumer {
                         });
 
                 try {
+                    // TODO: Check if something changed and send a Kafka Event
                     WatchProviders watchProviders = tmdb.getMovies().getWatchProviders(movie.getMovieId())
                             .getResults().get("GR");
                     movie.setWatchProviders(watchProviders);

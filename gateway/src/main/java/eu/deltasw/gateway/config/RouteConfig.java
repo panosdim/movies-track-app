@@ -22,8 +22,9 @@ public class RouteConfig {
                                                 .uri("lb://auth-service"))
 
                                 // Endpoints for tmdb-service
-                                .route("tmdb_service", r -> r.path("/popular", "/search", "/autocomplete")
-                                                .uri("lb://tmdb-service"))
+                                .route("tmdb_service",
+                                                r -> r.path("/popular", "/search", "/autocomplete", "/watch-info")
+                                                                .uri("lb://tmdb-service"))
 
                                 // Endpoints for movie-service
                                 .route("movie_service", r -> r.path("/movies/**")

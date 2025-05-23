@@ -1,9 +1,9 @@
 package eu.deltasw.tmdb_service.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.deltasw.tmdb_service.model.dto.ErrorResponse;
 import eu.deltasw.tmdb_service.model.dto.SearchMovieRequest;
+import eu.deltasw.tmdb_service.model.dto.WatchInfoRequest;
+import eu.deltasw.tmdb_service.model.dto.WatchInfoResponse;
+import eu.deltasw.tmdb_service.repository.MovieRepository;
+import eu.deltasw.tmdb_service.service.WatchProvidersMapperService;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.tools.TmdbException;
 import info.movito.themoviedbapi.tools.builders.discover.DiscoverMovieParamBuilder;
@@ -26,9 +30,14 @@ import lombok.extern.slf4j.Slf4j;
 public class TMDbController {
 
     private final TmdbApi tmdb;
+    private final MovieRepository repository;
+    private final WatchProvidersMapperService watchProvidersMapperService;
 
-    public TMDbController(@Value("${tmdb.key}") String tmdbKey) {
-        tmdb = new TmdbApi(tmdbKey);
+    public TMDbController(TmdbApi tmdb, MovieRepository repository,
+            WatchProvidersMapperService watchProvidersMapperService) {
+        this.tmdb = tmdb;
+        this.repository = repository;
+        this.watchProvidersMapperService = watchProvidersMapperService;
     }
 
     @GetMapping("/popular")
@@ -72,6 +81,27 @@ public class TMDbController {
         } catch (TmdbException e) {
             log.warn("Cannot communicate with TMDb API");
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot communicate with TMDb API"));
+        }
+    }
+
+    @PostMapping("/watch-info")
+    public ResponseEntity<?> watchInfo(@Valid @RequestBody WatchInfoRequest movies) {
+        try {
+            var movieIds = movies.getMovies();
+
+            if (movieIds.isEmpty()) {
+                return ResponseEntity.badRequest().body(new ErrorResponse("movies is required"));
+            }
+
+            var results = repository.findByMovieIdIn(movieIds);
+            List<WatchInfoResponse> watchInfoResponse = results.stream()
+                    .map(movie -> new WatchInfoResponse(movie.getMovieId(), watchProvidersMapperService.convertToDto(
+                            movie.getWatchProviders())))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(watchInfoResponse);
+        } catch (Exception e) {
+            log.warn("Database error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse("Database error"));
         }
     }
 }

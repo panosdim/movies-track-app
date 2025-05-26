@@ -14,7 +14,7 @@ spring:
         show-sql: true
         properties:
             hibernate:
-                dialect: org.hibernate.dialect.PostgreSQLDialect
+                # dialect: org.hibernate.dialect.PostgreSQLDialect
 eureka:
     client:
         serviceUrl:
@@ -28,3 +28,19 @@ eureka:
         prefer-ip-address: true
 jwt:
     secret: ${JWT_SECRET}
+
+---
+spring:
+    config:
+        activate:
+            on-profile: local
+    datasource:
+        url: jdbc:postgresql://localhost:5432/authdb
+        username: postgres
+        password: postgres
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka/
+jwt:
+    secret: ak1PT09hbmlPdXZoaUVWUjRudXd6K0FHZHFBbUhIbFYvZUZEYUhzRTFzcXNoZEJCeGVYK1NFNW96T1RQQUVnSwpIc0F3R0VXMGFLRVQ0TmxiK2dXdkRRPT0=

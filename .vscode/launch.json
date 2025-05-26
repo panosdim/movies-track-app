@@ -1,0 +1,78 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AuthServiceApplication<auth-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.auth_service.AuthServiceApplication",
+            "projectName": "auth-service",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-EurekaApplication<eureka>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.eureka.EurekaApplication",
+            "projectName": "eureka",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GatewayApplication<gateway>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.gateway.GatewayApplication",
+            "projectName": "gateway",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MovieServiceApplication<movie-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.movie_service.MovieServiceApplication",
+            "projectName": "movie-service",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-TmdbServiceApplication<tmdb-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.tmdb_service.TmdbServiceApplication",
+            "projectName": "tmdb-service",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ConfigServerApplication<config-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.config_server.ConfigServerApplication",
+            "projectName": "config-server",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

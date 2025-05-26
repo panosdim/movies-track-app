@@ -39,3 +39,21 @@ eureka:
         prefer-ip-address: true
 jwt:
     secret: ${JWT_SECRET}
+
+---
+spring:
+    config:
+        activate:
+            on-profile: local
+    kafka:
+        bootstrap-servers: localhost:9092
+    datasource:
+        url: jdbc:postgresql://localhost:5432/moviedb
+        username: postgres
+        password: postgres
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka/
+jwt:
+    secret: ak1PT09hbmlPdXZoaUVWUjRudXd6K0FHZHFBbUhIbFYvZUZEYUhzRTFzcXNoZEJCeGVYK1NFNW96T1RQQUVnSwpIc0F3R0VXMGFLRVQ0TmxiK2dXdkRRPT0=

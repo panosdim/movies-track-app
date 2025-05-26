@@ -79,6 +79,8 @@ services:
     auth-service:
         build: ./auth-service
         container_name: auth-service
+        env_file:
+            - .env
         depends_on:
             - eureka
             - config-server
@@ -88,6 +90,8 @@ services:
     movie-service:
         build: ./movie-service
         container_name: movie-service
+        env_file:
+            - .env
         depends_on:
             - eureka
             - config-server
@@ -97,6 +101,8 @@ services:
     tmdb-service:
         build: ./tmdb-service
         container_name: tmdb-service
+        env_file:
+            - .env
         depends_on:
             - eureka
             - config-server

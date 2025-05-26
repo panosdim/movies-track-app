@@ -11,6 +11,8 @@ spring:
                 max-interval: 10000 # Max wait time in ms (default is 2000)
                 multiplier: 1.5 # Backoff multiplier (default is 1.1)
             name: auth-service
+            username: ${CONFIG_USERNAME}
+            password: ${CONFIG_PASSWORD}
 eureka:
     client:
         service-url:

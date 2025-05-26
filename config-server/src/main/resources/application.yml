@@ -12,6 +12,10 @@ spring:
                     password: ${PASSWORD}
                     clone-on-start: true
                     default-label: main
+    security:
+        user:
+            name: ${CONFIG_USERNAME}
+            password: ${CONFIG_PASSWORD}
 eureka:
     client:
         serviceUrl:

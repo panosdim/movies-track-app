@@ -1,5 +1,8 @@
 package eu.deltasw.movie_service.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,11 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.deltasw.common.events.model.EventType;
+import eu.deltasw.common.model.dto.WatchInfoRequest;
 import eu.deltasw.common.util.RequestContext;
+import eu.deltasw.movie_service.data.WatchInfoClient;
 import eu.deltasw.movie_service.model.Movie;
 import eu.deltasw.movie_service.model.dto.AddMovieRequest;
 import eu.deltasw.movie_service.model.dto.ErrorResponse;
 import eu.deltasw.movie_service.model.dto.RateRequest;
+import eu.deltasw.movie_service.model.dto.WatchlistResponse;
 import eu.deltasw.movie_service.repository.MovieRepository;
 import eu.deltasw.movie_service.service.MovieEventProducer;
 import jakarta.validation.Valid;
@@ -27,10 +33,13 @@ public class MovieController {
 
     private final MovieRepository repository;
     private final MovieEventProducer movieEventProducer;
+    private final WatchInfoClient watchInfoClient;
 
-    public MovieController(MovieRepository repository, MovieEventProducer movieEventProducer) {
+    public MovieController(MovieRepository repository, MovieEventProducer movieEventProducer,
+            WatchInfoClient watchInfoClient) {
         this.repository = repository;
         this.movieEventProducer = movieEventProducer;
+        this.watchInfoClient = watchInfoClient;
     }
 
     @GetMapping("/watched")
@@ -54,7 +63,36 @@ public class MovieController {
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot extract email from JWT"));
         }
 
-        return ResponseEntity.ok(repository.findByUserIdAndWatchedIsFalseOrWatchedIsNull(userId));
+        var movies = repository.findByUserIdAndWatchedIsFalseOrWatchedIsNull(userId);
+
+        // Fetch watch info for the movies
+        var movieIds = new ArrayList<>(
+                movies.stream()
+                        .map(Movie::getMovieId)
+                        .toList());
+
+        log.info("Fetching watch info for movies: {}", movieIds);
+        if (movieIds.isEmpty()) {
+            return ResponseEntity.ok(movies); // Return movies without watch info data
+        }
+
+        var watchInfoResponse = watchInfoClient.getWatchInfo(new WatchInfoRequest(movieIds));
+        List<WatchlistResponse> watchlistResponse = new ArrayList<>();
+
+        // Combine the watch info and movies to MovieResponse
+        watchInfoResponse.forEach(info -> {
+            movies.stream()
+                    .filter(movie -> movie.getMovieId().equals(info.getMovieId()))
+                    .findFirst()
+                    .ifPresent(movie -> watchlistResponse.add(new WatchlistResponse(
+                            movie.getId(),
+                            movie.getMovieId(),
+                            movie.getTitle(),
+                            movie.getPoster(),
+                            info.getWatchProviders())));
+        });
+
+        return ResponseEntity.ok(watchlistResponse);
     }
 
     @PostMapping

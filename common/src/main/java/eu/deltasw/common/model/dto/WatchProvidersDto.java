@@ -1,4 +1,4 @@
-package eu.deltasw.tmdb_service.model.dto;
+package eu.deltasw.common.model.dto;
 
 import java.util.List;
 

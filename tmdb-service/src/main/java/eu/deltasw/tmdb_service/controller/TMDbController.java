@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.deltasw.common.model.dto.WatchInfoRequest;
+import eu.deltasw.common.model.dto.WatchInfoResponse;
 import eu.deltasw.tmdb_service.model.dto.ErrorResponse;
 import eu.deltasw.tmdb_service.model.dto.SearchMovieRequest;
-import eu.deltasw.tmdb_service.model.dto.WatchInfoRequest;
-import eu.deltasw.tmdb_service.model.dto.WatchInfoResponse;
 import eu.deltasw.tmdb_service.repository.MovieRepository;
 import eu.deltasw.tmdb_service.service.WatchProvidersMapperService;
 import info.movito.themoviedbapi.TmdbApi;

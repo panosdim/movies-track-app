@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import eu.deltasw.tmdb_service.model.dto.ProviderDto;
-import eu.deltasw.tmdb_service.model.dto.WatchProvidersDto;
+import eu.deltasw.common.model.dto.ProviderDto;
+import eu.deltasw.common.model.dto.WatchProvidersDto;
 import info.movito.themoviedbapi.model.core.watchproviders.Provider;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 

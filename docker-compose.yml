@@ -23,7 +23,7 @@ services:
         volumes:
             - kafka-data:/var/lib/kafka/data
         networks:
-            - kafka-net
+            - movies-net
 
     kafka-ui:
         image: provectuslabs/kafka-ui:latest
@@ -43,7 +43,7 @@ services:
             SPRING_SECURITY_USER_PASSWORD: ${KAFKA_UI_PASSWORD}
         restart: unless-stopped
         networks:
-            - kafka-net
+            - movies-net
 
     config-server:
         build: ./config-server
@@ -53,7 +53,7 @@ services:
         env_file:
             - .env
         networks:
-            - kafka-net
+            - movies-net
 
     eureka:
         build: ./eureka
@@ -63,7 +63,7 @@ services:
         depends_on:
             - config-server
         networks:
-            - kafka-net
+            - movies-net
 
     gateway:
         build: ./gateway
@@ -74,7 +74,7 @@ services:
             - eureka
             - config-server
         networks:
-            - kafka-net
+            - movies-net
 
     auth-service:
         build: ./auth-service
@@ -85,7 +85,7 @@ services:
             - eureka
             - config-server
         networks:
-            - kafka-net
+            - movies-net
 
     movie-service:
         build: ./movie-service
@@ -96,7 +96,7 @@ services:
             - eureka
             - config-server
         networks:
-            - kafka-net
+            - movies-net
 
     tmdb-service:
         build: ./tmdb-service
@@ -107,10 +107,10 @@ services:
             - eureka
             - config-server
         networks:
-            - kafka-net
+            - movies-net
 
     postgresql:
-        image: postgres:16-alpine
+        image: postgres:17-alpine
         container_name: postgresql
         environment:
             POSTGRES_USER: postgres
@@ -121,7 +121,7 @@ services:
             - pgdata:/var/lib/postgresql/data
             - ./init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh:ro
         networks:
-            - kafka-net
+            - movies-net
 
     pgadmin:
         image: dpage/pgadmin4:9.3.0
@@ -136,10 +136,10 @@ services:
         depends_on:
             - postgresql
         networks:
-            - kafka-net
+            - movies-net
 
 networks:
-    kafka-net:
+    movies-net:
 
 volumes:
     kafka-data:

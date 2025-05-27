@@ -24,7 +24,7 @@ public class MovieEventsConsumer {
         tmdb = new TmdbApi(tmdbKey);
     }
 
-    @KafkaListener(topics = "movie-events", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "${movie.events.topic}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
     public void consumeMovieEvent(MovieEvent event) {
         log.info("Received movie event: {}", event.toString());
 
@@ -40,7 +40,6 @@ public class MovieEventsConsumer {
                         });
 
                 try {
-                    // TODO: Check if something changed and send a Kafka Event
                     WatchProviders watchProviders = tmdb.getMovies().getWatchProviders(movie.getMovieId())
                             .getResults().get("GR");
                     movie.setWatchProviders(watchProviders);
@@ -50,7 +49,7 @@ public class MovieEventsConsumer {
 
                 repository.save(movie);
                 break;
-            case EventType.RATE, EventType.DELETE:
+            case EventType.RATE, EventType.DELETE, EventType.WATCH_INFO_UPDATED:
                 break;
             default:
                 log.warn("Received unknown event type: {}", event.getEventType());

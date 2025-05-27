@@ -1,11 +1,6 @@
 {
   "properties": [
     {
-      "name": "movie.events.topic",
-      "type": "java.lang.String",
-      "description": "Kafka topic for movie events"
-    },
-    {
       "name": "jwt.secret",
       "type": "java.lang.String",
       "description": "JWT secret key for signing tokens"

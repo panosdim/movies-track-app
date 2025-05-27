@@ -8,10 +8,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import eu.deltasw.common.exception.autoconfigure.ExceptionHandlerAutoConfiguration;
 import eu.deltasw.common.security.autoconfigure.JwtFilterAutoConfiguration;
+import eu.deltasw.common.security.autoconfigure.MovieEventProducerAutoConfiguration;
 
 @EnableScheduling
 @SpringBootApplication
-@Import({ ExceptionHandlerAutoConfiguration.class, JwtFilterAutoConfiguration.class })
+@Import({ ExceptionHandlerAutoConfiguration.class, JwtFilterAutoConfiguration.class,
+        MovieEventProducerAutoConfiguration.class })
 @EnableFeignClients
 public class MovieServiceApplication {
 

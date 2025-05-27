@@ -1,3 +1,5 @@
 eu.deltasw.common.security.autoconfigure.JwtAutoConfiguration
 eu.deltasw.common.exception.autoconfigure.ExceptionHandlerAutoConfiguration
 eu.deltasw.common.security.autoconfigure.JwtFilterAutoConfiguration
+eu.deltasw.common.security.autoconfigure.MovieEventProducerAutoConfiguration
+

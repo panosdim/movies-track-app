@@ -14,6 +14,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableDiscoveryClient
 public class RouteConfig {
+        @SuppressWarnings("null")
         @Bean
         public RouteLocator routes(RouteLocatorBuilder builder) {
                 return builder.routes()
@@ -23,7 +24,24 @@ public class RouteConfig {
 
                                 // Endpoints for tmdb-service
                                 .route("tmdb_service",
-                                                r -> r.path("/popular", "/search", "/autocomplete", "/watch-info")
+                                                r -> r.path("/popular", "/search", "/autocomplete")
+                                                                .uri("lb://tmdb-service"))
+                                // /watch-info only available in 'local' profile
+                                .route("tmdb_service_watch_info_local",
+                                                r -> r.path("/watch-info")
+                                                                .and()
+                                                                .predicate(exchange -> {
+                                                                        String[] profiles = exchange
+                                                                                        .getApplicationContext()
+                                                                                        .getEnvironment()
+                                                                                        .getActiveProfiles();
+                                                                        for (String profile : profiles) {
+                                                                                if ("local".equals(profile)) {
+                                                                                        return true;
+                                                                                }
+                                                                        }
+                                                                        return false;
+                                                                })
                                                                 .uri("lb://tmdb-service"))
 
                                 // Endpoints for movie-service

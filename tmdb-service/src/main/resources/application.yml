@@ -20,6 +20,9 @@ spring:
             value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
             properties:
                 '[spring.json.trusted.packages]': 'eu.deltasw.common.events.model'
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 # Topic name
 movie:
     events:
@@ -37,6 +40,10 @@ eureka:
         prefer-ip-address: true
 tmdb:
     key: ${TMDB_KEY}
+
+watchproviders:
+    update:
+        cron: 0 * * * * ? # Every minute
 
 ---
 spring:

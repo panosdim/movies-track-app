@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum EventType {
     ADD,
     RATE,
+    WATCH_INFO_UPDATED,
     DELETE;
 
     @JsonValue

@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.deltasw.common.events.model.EventType;
+import eu.deltasw.common.events.model.MovieEvent;
 import eu.deltasw.common.model.dto.WatchInfoRequest;
+import eu.deltasw.common.service.MovieEventProducer;
 import eu.deltasw.common.util.RequestContext;
 import eu.deltasw.movie_service.data.WatchInfoClient;
 import eu.deltasw.movie_service.model.Movie;
@@ -22,7 +24,6 @@ import eu.deltasw.movie_service.model.dto.ErrorResponse;
 import eu.deltasw.movie_service.model.dto.RateRequest;
 import eu.deltasw.movie_service.model.dto.WatchlistResponse;
 import eu.deltasw.movie_service.repository.MovieRepository;
-import eu.deltasw.movie_service.service.MovieEventProducer;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -112,7 +113,8 @@ public class MovieController {
                 .build();
 
         Movie savedMovie = repository.save(movie);
-        movieEventProducer.sendMovieEvent(savedMovie, EventType.ADD);
+        MovieEvent event = new MovieEvent(EventType.ADD, movie.getUserId(), movie.getMovieId(), movie.getRating());
+        movieEventProducer.sendMovieEvent(event);
         return ResponseEntity.ok(savedMovie);
     }
 
@@ -147,7 +149,9 @@ public class MovieController {
                 .filter(m -> m.getUserId().equals(userId))
                 .map(movie -> {
                     movie.setRating(rateRequest.getRating());
-                    movieEventProducer.sendMovieEvent(movie, EventType.RATE);
+                    MovieEvent event = new MovieEvent(EventType.RATE, movie.getUserId(), movie.getMovieId(),
+                            movie.getRating());
+                    movieEventProducer.sendMovieEvent(event);
                     return ResponseEntity.ok(repository.save(movie));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -166,7 +170,9 @@ public class MovieController {
                 .filter(m -> m.getUserId().equals(userId))
                 .map(movie -> {
                     repository.delete(movie);
-                    movieEventProducer.sendMovieEvent(movie, EventType.DELETE);
+                    MovieEvent event = new MovieEvent(EventType.DELETE, movie.getUserId(), movie.getMovieId(),
+                            movie.getRating());
+                    movieEventProducer.sendMovieEvent(event);
                     return ResponseEntity.noContent().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());

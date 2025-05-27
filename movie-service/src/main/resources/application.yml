@@ -19,10 +19,6 @@ spring:
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
             properties:
                 '[spring.json.add.type.headers]': true
-# Topic name
-movie:
-    events:
-        topic: movie-events
 eureka:
     client:
         serviceUrl:
@@ -36,6 +32,9 @@ eureka:
         prefer-ip-address: true
 jwt:
     secret: ${JWT_SECRET}
+movie:
+    events:
+        topic: movie-events
 
 ---
 spring:

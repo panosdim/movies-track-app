@@ -1,17 +1,24 @@
-{"properties": [
-  {
-    "name": "movie.events.topic",
-    "type": "java.lang.String",
-    "description": "A description for 'movie.events.topic'"
-  },
-  {
-    "name": "jwt.secret",
-    "type": "java.lang.String",
-    "description": "A description for 'jwt.secret'"
-  },
-  {
-    "name": "tmdb.key",
-    "type": "java.lang.String",
-    "description": "A description for 'tmdb.key'"
-  }
-]}
+{
+  "properties": [
+    {
+      "name": "movie.events.topic",
+      "type": "java.lang.String",
+      "description": "A description for 'movie.events.topic'"
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "A description for 'jwt.secret'"
+    },
+    {
+      "name": "tmdb.key",
+      "type": "java.lang.String",
+      "description": "A description for 'tmdb.key'"
+    },
+    {
+      "name": "watchproviders.update.cron",
+      "type": "java.lang.String",
+      "description": "A description for 'watchproviders.update.cron'"
+    }
+  ]
+}

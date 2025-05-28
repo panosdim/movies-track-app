@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.deltasw.common.events.model.EventType;
 import eu.deltasw.common.events.model.MovieEvent;
 import eu.deltasw.common.model.dto.WatchInfoRequest;
+import eu.deltasw.common.model.dto.WatchInfoResponse;
 import eu.deltasw.common.service.MovieEventProducer;
 import eu.deltasw.common.util.RequestContext;
 import eu.deltasw.movie_service.data.WatchInfoClient;
@@ -24,6 +25,7 @@ import eu.deltasw.movie_service.model.dto.ErrorResponse;
 import eu.deltasw.movie_service.model.dto.RateRequest;
 import eu.deltasw.movie_service.model.dto.WatchlistResponse;
 import eu.deltasw.movie_service.repository.MovieRepository;
+import feign.FeignException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,10 +76,26 @@ public class MovieController {
 
         log.info("Fetching watch info for movies: {}", movieIds);
         if (movieIds.isEmpty()) {
-            return ResponseEntity.ok(movies); // Return movies without watch info data
+            return ResponseEntity.ok(movies); // Return empty response
         }
 
-        var watchInfoResponse = watchInfoClient.getWatchInfo(new WatchInfoRequest(movieIds));
+        List<WatchInfoResponse> watchInfoResponse;
+        try {
+            // Fetch watch info from the watch info client
+            watchInfoResponse = watchInfoClient.getWatchInfo(new WatchInfoRequest(movieIds));
+        } catch (FeignException e) {
+            log.error("Error fetching watch info", e);
+            var response = movies.stream()
+                    .map(movie -> new WatchlistResponse(
+                            movie.getId(),
+                            movie.getMovieId(),
+                            movie.getTitle(),
+                            movie.getPoster(),
+                            null)) // No watch info available
+                    .toList();
+            return ResponseEntity.ok(response); // Return movies without watch info data
+        }
+
         List<WatchlistResponse> watchlistResponse = new ArrayList<>();
 
         // Combine the watch info and movies to MovieResponse

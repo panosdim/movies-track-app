@@ -9,5 +9,7 @@ import eu.deltasw.movie_service.model.Movie;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByUserIdAndWatchedIsFalseOrWatchedIsNull(String userId);
 
+    List<Movie> findByMovieIdAndWatchedIsFalseOrWatchedIsNull(Integer movieId);
+
     List<Movie> findByUserIdAndWatchedIsTrue(String userId);
 }

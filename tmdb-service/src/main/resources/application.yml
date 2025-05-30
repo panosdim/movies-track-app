@@ -5,8 +5,8 @@ spring:
         name: tmdb-service
     datasource:
         url: ${DB_URL}
-        username: ${DB_USER}
-        password: ${DB_PASSWORD}
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
         driver-class-name: org.postgresql.Driver
     jpa:
         hibernate:
@@ -54,11 +54,7 @@ spring:
         bootstrap-servers: localhost:9092
     datasource:
         url: jdbc:postgresql://localhost:5432/tmdbdb
-        username: postgres
-        password: postgres
 eureka:
     client:
         serviceUrl:
             defaultZone: http://localhost:8761/eureka/
-jwt:
-    secret: ak1PT09hbmlPdXZoaUVWUjRudXd6K0FHZHFBbUhIbFYvZUZEYUhzRTFzcXNoZEJCeGVYK1NFNW96T1RQQUVnSwpIc0F3R0VXMGFLRVQ0TmxiK2dXdkRRPT0=

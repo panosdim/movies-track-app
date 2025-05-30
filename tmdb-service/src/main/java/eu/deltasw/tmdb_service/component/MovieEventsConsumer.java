@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import eu.deltasw.common.events.model.EventType;
 import eu.deltasw.common.events.model.MovieEvent;
 import eu.deltasw.tmdb_service.model.Movie;
 import eu.deltasw.tmdb_service.repository.MovieRepository;
@@ -29,7 +28,7 @@ public class MovieEventsConsumer {
         log.info("Received movie event: {}", event.toString());
 
         switch (event.getEventType()) {
-            case EventType.ADD:
+            case ADD:
                 log.info("Processing MOVIE_ADDED for movieId: {}", event.getMovieId());
 
                 Movie movie = repository.findByMovieId(event.getMovieId())
@@ -49,7 +48,7 @@ public class MovieEventsConsumer {
 
                 repository.save(movie);
                 break;
-            case EventType.RATE, EventType.DELETE, EventType.WATCH_INFO_UPDATED:
+            case RATE, DELETE, WATCH_INFO_UPDATED:
                 break;
             default:
                 log.warn("Received unknown event type: {}", event.getEventType());

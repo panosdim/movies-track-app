@@ -1,9 +1,13 @@
 server:
-  port: 8761
+    port: 8761
 
 eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-  server:
-    wait-time-in-ms-when-sync-empty: 0
+    instance:
+        metadata-map:
+            environment: production
+            datacenter: oracle
+    client:
+        register-with-eureka: false
+        fetch-registry: false
+    server:
+        wait-time-in-ms-when-sync-empty: 0

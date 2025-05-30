@@ -11,6 +11,8 @@
             "env": {
                 "SPRING_PROFILES_ACTIVE": "local"
             },
+            "vmArgs": " -Dcom.sun.management.jmxremote",
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
@@ -23,6 +25,7 @@
             "env": {
                 "SPRING_PROFILES_ACTIVE": "local"
             },
+            "vmArgs": " -Dcom.sun.management.jmxremote"
         },
         {
             "type": "java",
@@ -35,6 +38,7 @@
             "env": {
                 "SPRING_PROFILES_ACTIVE": "local"
             },
+            "vmArgs": " -Dcom.sun.management.jmxremote"
         },
         {
             "type": "java",
@@ -47,6 +51,8 @@
             "env": {
                 "SPRING_PROFILES_ACTIVE": "local"
             },
+            "vmArgs": " -Dcom.sun.management.jmxremote",
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "java",
@@ -68,6 +74,19 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.config_server.ConfigServerApplication",
             "projectName": "config-server",
+            "args": "",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-NotificationServiceApplication<notification-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "eu.deltasw.notification_service.NotificationServiceApplication",
+            "projectName": "notification-service",
             "args": "",
             "env": {
                 "SPRING_PROFILES_ACTIVE": "local"

@@ -5,8 +5,8 @@ spring:
         name: movie-service
     datasource:
         url: ${DB_URL}
-        username: ${DB_USER}
-        password: ${DB_PASSWORD}
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
         driver-class-name: org.postgresql.Driver
     jpa:
         hibernate:
@@ -19,6 +19,12 @@ spring:
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
             properties:
                 '[spring.json.add.type.headers]': true
+        consumer:
+            group-id: notification-movie-event-consumers
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                '[spring.json.trusted.packages]': 'eu.deltasw.common.events.model'
 eureka:
     client:
         serviceUrl:
@@ -45,8 +51,6 @@ spring:
         bootstrap-servers: localhost:9092
     datasource:
         url: jdbc:postgresql://localhost:5432/moviedb
-        username: postgres
-        password: postgres
 eureka:
     client:
         serviceUrl:

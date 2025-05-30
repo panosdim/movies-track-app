@@ -46,17 +46,17 @@ services:
             - movies-net
 
     config-server:
-        build: ./config-server
+        image: ghcr.io/panosdim/config-server:latest
         container_name: config-server
-        depends_on:
-            - broker
         env_file:
             - .env
+        depends_on:
+            - broker
         networks:
             - movies-net
 
     eureka:
-        build: ./eureka
+        image: ghcr.io/panosdim/eureka:latest
         container_name: eureka
         ports:
             - '8761:8761'
@@ -66,7 +66,7 @@ services:
             - movies-net
 
     gateway:
-        build: ./gateway
+        image: ghcr.io/panosdim/gateway:latest
         container_name: gateway
         ports:
             - '8080:8080'
@@ -77,7 +77,7 @@ services:
             - movies-net
 
     auth-service:
-        build: ./auth-service
+        image: ghcr.io/panosdim/auth-service:latest
         container_name: auth-service
         env_file:
             - .env
@@ -88,7 +88,7 @@ services:
             - movies-net
 
     movie-service:
-        build: ./movie-service
+        image: ghcr.io/panosdim/movie-service:latest
         container_name: movie-service
         env_file:
             - .env
@@ -99,7 +99,7 @@ services:
             - movies-net
 
     tmdb-service:
-        build: ./tmdb-service
+        image: ghcr.io/panosdim/tmdb-service:latest
         container_name: tmdb-service
         env_file:
             - .env
@@ -112,9 +112,11 @@ services:
     postgresql:
         image: postgres:17-alpine
         container_name: postgresql
+        env_file:
+            - .env
         environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         ports:
             - '5432:5432'
         volumes:

@@ -3,6 +3,7 @@ package eu.deltasw.notification_service.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import eu.deltasw.common.model.dto.MovieNotifyRequest;
@@ -20,6 +21,7 @@ public class EmailService implements NotificationService {
         this.mailSender = mailSender;
     }
 
+    @Async
     @Override
     public void sendNotification(MovieNotifyRequest request) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();

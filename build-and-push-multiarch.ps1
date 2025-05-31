@@ -4,13 +4,17 @@
 
 $ErrorActionPreference = 'Stop'
 
+Write-Host "=== Building all Maven modules ==="
+mvn clean package -DskipTests
+
 $services = @(
     @{ name = 'auth-service';    path = 'auth-service' },
     @{ name = 'config-server';   path = 'config-server' },
     @{ name = 'eureka';          path = 'eureka' },
     @{ name = 'gateway';         path = 'gateway' },
     @{ name = 'movie-service';   path = 'movie-service' },
-    @{ name = 'tmdb-service';    path = 'tmdb-service' }
+    @{ name = 'tmdb-service';    path = 'tmdb-service' },
+    @{ name = 'notification-service';    path = 'notification-service' }
 )
 
 $ghcrUser = 'panosdim'

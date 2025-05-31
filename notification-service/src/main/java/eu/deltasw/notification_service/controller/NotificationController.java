@@ -23,6 +23,7 @@ public class NotificationController {
     @PostMapping("/notify")
     public ResponseEntity<?> notify(@Valid @RequestBody MovieNotifyRequest notifyRequest) {
         logger.info("Received notification request: {}", notifyRequest);
+        // Run email sending async
         emailService.sendNotification(notifyRequest);
         return ResponseEntity.noContent().<Void>build();
     }

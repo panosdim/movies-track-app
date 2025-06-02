@@ -17,6 +17,9 @@ public class EmailService implements NotificationService {
     @Value("${spring.mail.username}")
     private String from;
 
+    @Value("${tmdb.image.base-url}")
+    private String imageBaseUrl;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
@@ -33,7 +36,8 @@ public class EmailService implements NotificationService {
             }
             helper.setSubject("Movie Notification");
 
-            var imageUrl = "https://image.tmdb.org/t/p/" + request.getMoviePoster();
+            // Use imageBaseUrl from application.yml
+            String imageUrl = imageBaseUrl + request.getMoviePoster();
             String htmlMsg = "<h2>Watch providers updated for movie: " + request.getMovieTitle() + "</h2>"
                     + "<img src='" + imageUrl + "' alt='Movie Image' />";
             helper.setText(htmlMsg, true);

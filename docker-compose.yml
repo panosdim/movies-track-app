@@ -109,6 +109,17 @@ services:
         networks:
             - movies-net
 
+    notification-service:
+        image: ghcr.io/panosdim/notification-service:latest
+        container_name: notification-service
+        env_file:
+            - .env
+        depends_on:
+            - eureka
+            - config-server
+        networks:
+            - movies-net
+
     postgresql:
         image: postgres:17-alpine
         container_name: postgresql

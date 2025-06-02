@@ -33,7 +33,8 @@ public class MovieEventListener {
                 break;
             case WATCH_INFO_UPDATED:
                 var usersWithMovieInWatchList = repository
-                        .findByMovieIdAndWatchedIsFalseOrWatchedIsNull(event.getMovieId());
+                        .findUnwatchedByMovieId(event.getMovieId());
+                log.info("Users with movie in watchlist: {}", usersWithMovieInWatchList);
                 if (!usersWithMovieInWatchList.isEmpty()) {
                     var users = usersWithMovieInWatchList.stream()
                             .map(movie -> movie.getUserId())

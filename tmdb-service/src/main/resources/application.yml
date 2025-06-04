@@ -23,6 +23,14 @@ spring:
         producer:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+management:
+    tracing:
+        sampling:
+            probability: 0.8
+        enabled: true
+    zipkin:
+        tracing:
+            endpoint: http://zipkin:9411/api/v2/spans
 # Topic name
 movie:
     events:
@@ -58,3 +66,11 @@ eureka:
     client:
         serviceUrl:
             defaultZone: http://localhost:8761/eureka/
+management:
+    tracing:
+        sampling:
+            probability: 1.0
+        enabled: true
+    zipkin:
+        tracing:
+            endpoint: http://localhost:9411/api/v2/spans

@@ -14,9 +14,9 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableDiscoveryClient
 public class RouteConfig {
-        @SuppressWarnings("null")
-        @Bean
-        public RouteLocator routes(RouteLocatorBuilder builder) {
+    @SuppressWarnings("null")
+    @Bean
+    RouteLocator routes(RouteLocatorBuilder builder) {
                 return builder.routes()
                                 // Endpoints for auth-service
                                 .route("auth_service", r -> r.path("/login", "/register")
@@ -50,8 +50,8 @@ public class RouteConfig {
                                 .build();
         }
 
-        @Bean
-        public CorsWebFilter corsWebFilter() {
+    @Bean
+    CorsWebFilter corsWebFilter() {
                 CorsConfiguration corsConfig = new CorsConfiguration();
                 corsConfig.setAllowedOriginPatterns(List.of("*"));
                 corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

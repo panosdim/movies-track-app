@@ -1,13 +1,18 @@
 package eu.deltasw.tmdb_service.model;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
+import org.hibernate.annotations.Type;
+
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
-import jakarta.persistence.*;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
 @Entity
 @Data
@@ -25,5 +30,3 @@ public class Movie {
     @Column(columnDefinition = "jsonb")
     private WatchProviders watchProviders;
 }
-
-

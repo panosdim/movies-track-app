@@ -25,7 +25,14 @@ eureka:
         prefer-ip-address: true
 jwt:
     secret: ${JWT_SECRET}
-
+management:
+    tracing:
+        sampling:
+            probability: 0.5
+        enabled: true
+    zipkin:
+        tracing:
+            endpoint: http://zipkin:9411/api/v2/spans
 ---
 spring:
     config:
@@ -39,3 +46,11 @@ eureka:
             defaultZone: http://localhost:8761/eureka/
 jwt:
     secret: ak1PT09hbmlPdXZoaUVWUjRudXd6K0FHZHFBbUhIbFYvZUZEYUhzRTFzcXNoZEJCeGVYK1NFNW96T1RQQUVnSwpIc0F3R0VXMGFLRVQ0TmxiK2dXdkRRPT0=
+management:
+    tracing:
+        sampling:
+            probability: 1.0
+        enabled: true
+    zipkin:
+        tracing:
+            endpoint: http://localhost:9411/api/v2/spans

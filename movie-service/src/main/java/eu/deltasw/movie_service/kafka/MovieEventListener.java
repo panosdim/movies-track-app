@@ -40,8 +40,8 @@ public class MovieEventListener {
                             .map(movie -> movie.getUserId())
                             .distinct()
                             .toList();
-                    var movieTitle = usersWithMovieInWatchList.get(0).getTitle();
-                    var moviePoster = usersWithMovieInWatchList.get(0).getPoster();
+                    var movieTitle = usersWithMovieInWatchList.getFirst().getTitle();
+                    var moviePoster = usersWithMovieInWatchList.getFirst().getPoster();
 
                     // Send notification
                     var notifyRequest = new MovieNotifyRequest();

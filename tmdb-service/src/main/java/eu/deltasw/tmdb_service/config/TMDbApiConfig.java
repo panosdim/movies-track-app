@@ -9,7 +9,7 @@ import info.movito.themoviedbapi.TmdbApi;
 @Configuration
 public class TMDbApiConfig {
     @Bean
-    public TmdbApi tmdbApi(@Value("${tmdb.key}") String tmdbKey) {
+    TmdbApi tmdbApi(@Value("${tmdb.key}") String tmdbKey) {
         return new TmdbApi(tmdbKey);
     }
 }

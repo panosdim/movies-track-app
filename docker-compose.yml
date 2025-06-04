@@ -48,10 +48,17 @@ services:
     config-server:
         image: ghcr.io/panosdim/config-server:latest
         container_name: config-server
+        ports:
+            - '8888:8888'
         env_file:
             - .env
         depends_on:
-            - broker
+            - eureka
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:8888/actuator/health']
+            interval: 10s
+            timeout: 5s
+            retries: 3
         networks:
             - movies-net
 
@@ -60,8 +67,11 @@ services:
         container_name: eureka
         ports:
             - '8761:8761'
-        depends_on:
-            - config-server
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:8761/actuator/health']
+            interval: 10s
+            timeout: 5s
+            retries: 3
         networks:
             - movies-net
 
@@ -71,8 +81,10 @@ services:
         ports:
             - '8080:8080'
         depends_on:
-            - eureka
-            - config-server
+            eureka:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
         networks:
             - movies-net
 
@@ -82,8 +94,10 @@ services:
         env_file:
             - .env
         depends_on:
-            - eureka
-            - config-server
+            eureka:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
         networks:
             - movies-net
 
@@ -93,8 +107,12 @@ services:
         env_file:
             - .env
         depends_on:
-            - eureka
-            - config-server
+            eureka:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+            broker:
+                condition: service_started
         networks:
             - movies-net
 
@@ -104,8 +122,12 @@ services:
         env_file:
             - .env
         depends_on:
-            - eureka
-            - config-server
+            eureka:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
+            broker:
+                condition: service_started
         networks:
             - movies-net
 
@@ -115,8 +137,10 @@ services:
         env_file:
             - .env
         depends_on:
-            - eureka
-            - config-server
+            eureka:
+                condition: service_healthy
+            config-server:
+                condition: service_healthy
         networks:
             - movies-net
 
@@ -133,6 +157,14 @@ services:
         volumes:
             - pgdata:/var/lib/postgresql/data
             - ./init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh:ro
+        networks:
+            - movies-net
+
+    zipkin:
+        image: openzipkin/zipkin:2.24
+        container_name: zipkin
+        ports:
+            - '9411:9411'
         networks:
             - movies-net
 networks:

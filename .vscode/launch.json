@@ -2,7 +2,7 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Spring Boot-AuthServiceApplication<auth-service>",
+            "name": "auth-service",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.auth_service.AuthServiceApplication",
@@ -16,7 +16,7 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-EurekaApplication<eureka>",
+            "name": "eureka",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.eureka.EurekaApplication",
@@ -29,7 +29,7 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-GatewayApplication<gateway>",
+            "name": "gateway",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.gateway.GatewayApplication",
@@ -42,7 +42,7 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-MovieServiceApplication<movie-service>",
+            "name": "movie-service",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.movie_service.MovieServiceApplication",
@@ -56,7 +56,7 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-TmdbServiceApplication<tmdb-service>",
+            "name": "tmdb-service",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.tmdb_service.TmdbServiceApplication",
@@ -69,7 +69,7 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-ConfigServerApplication<config-server>",
+            "name": "config-server",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.config_server.ConfigServerApplication",
@@ -82,7 +82,7 @@
         },
         {
             "type": "java",
-            "name": "Spring Boot-NotificationServiceApplication<notification-service>",
+            "name": "notification-service",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "mainClass": "eu.deltasw.notification_service.NotificationServiceApplication",

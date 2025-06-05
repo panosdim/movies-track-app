@@ -2,10 +2,12 @@
 # build-and-push-multiarch.ps1
 # Build and push multi-arch images for all microservices to ghcr.io
 
-$ErrorActionPreference = 'Stop'
+param(
+    [Parameter(Position=0, Mandatory=$false)]
+    [string]$ServiceName
+)
 
-Write-Host "=== Building all Maven modules ==="
-mvn clean package -DskipTests
+$ErrorActionPreference = 'Stop'
 
 $services = @(
     @{ name = 'auth-service';    path = 'auth-service' },
@@ -17,9 +19,30 @@ $services = @(
     @{ name = 'notification-service';    path = 'notification-service' }
 )
 
+# Filter services based on parameter
+if ($ServiceName) {
+    $filteredServices = $services | Where-Object { $_.name -eq $ServiceName }
+    if ($filteredServices.Count -eq 0) {
+        Write-Error "Service '$ServiceName' not found. Available services: $($services.name -join ', ')"
+        exit 1
+    }
+    $servicesToBuild = $filteredServices
+    Write-Host "=== Building specific service: $ServiceName ==="
+} else {
+    $servicesToBuild = $services
+    Write-Host "=== Building all services ==="
+}
+
+Write-Host "=== Building Maven modules ==="
+if ($ServiceName) {
+    mvn clean package -pl $ServiceName -am -DskipTests
+} else {
+    mvn clean package -DskipTests
+}
+
 $ghcrUser = 'panosdim'
 
-foreach ($svc in $services) {
+foreach ($svc in $servicesToBuild) {
     $imgBase = "ghcr.io/$ghcrUser/$($svc.name)"
     Write-Host "=== Building $($svc.name) for amd64 ==="
     podman build --arch amd64 -t "${imgBase}:amd64" -f "$($svc.path)/Dockerfile" $($svc.path)
@@ -48,4 +71,8 @@ foreach ($svc in $services) {
     podman manifest push --all "${imgBase}:latest" "docker://${imgBase}:latest"
 }
 
-Write-Host "All microservices built and pushed as multi-arch images to ghcr.io/$ghcrUser/"
+if ($ServiceName) {
+    Write-Host "Service $ServiceName built and pushed as multi-arch image to ghcr.io/$ghcrUser/"
+} else {
+    Write-Host "All microservices built and pushed as multi-arch images to ghcr.io/$ghcrUser/"
+}

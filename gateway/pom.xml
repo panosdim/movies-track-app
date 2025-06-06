@@ -119,6 +119,23 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>com.sndyuk</groupId>
+            <artifactId>logback-more-appenders</artifactId>
+            <version>1.8.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fluentd</groupId>
+            <artifactId>fluent-logger</artifactId>
+            <version>0.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>8.0</version>
+        </dependency>
     </dependencies>
 
 

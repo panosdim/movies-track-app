@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <!-- Configuration for non-local profiles (Docker environment) -->
+    <springProfile name="!local">
+        <appender name="FLUENT" class="ch.qos.logback.more.appenders.DataFluentAppender">
+            <tag>movies-track.movie-service</tag>
+            <remoteHost>fluent-bit</remoteHost>
+            <port>24224</port>
+            <useEventTime>true</useEventTime>
+            <additionalField>
+                <key>service</key>
+                <value>movie</value>
+            </additionalField>
+            <additionalField>
+                <key>environment</key>
+                <value>docker</value>
+            </additionalField>
+        </appender>
+    </springProfile>
+    <!-- Configuration for local profile -->
+    <springProfile name="local">
+        <appender name="FLUENT" class="ch.qos.logback.more.appenders.DataFluentAppender">
+            <tag>movies-track.movie-service</tag>
+            <remoteHost>localhost</remoteHost>
+            <port>24224</port>
+            <useEventTime>true</useEventTime>
+            <additionalField>
+                <key>service</key>
+                <value>movie</value>
+            </additionalField>
+            <additionalField>
+                <key>environment</key>
+                <value>local</value>
+            </additionalField>
+        </appender>
+    </springProfile>
+
+    <root level="INFO">
+        <appender-ref ref="FLUENT" />
+    </root>
+</configuration>

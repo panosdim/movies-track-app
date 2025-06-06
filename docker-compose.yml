@@ -167,9 +167,72 @@ services:
             - '9411:9411'
         networks:
             - movies-net
+
+    opensearch:
+        image: opensearchproject/opensearch:2.11.1
+        container_name: opensearch
+        environment:
+            - cluster.name=opensearch-cluster
+            - node.name=opensearch
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m'
+            - 'DISABLE_INSTALL_DEMO_CONFIG=true'
+            - 'DISABLE_SECURITY_PLUGIN=true'
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        ports:
+            - '9200:9200'
+            - '9600:9600'
+        volumes:
+            - opensearch-data:/usr/share/opensearch/data
+        healthcheck:
+            test: ['CMD-SHELL', 'curl -f http://localhost:9200/_cluster/health || exit 1']
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        networks:
+            - movies-net
+
+    opensearch-dashboards:
+        image: opensearchproject/opensearch-dashboards:2.11.1
+        container_name: opensearch-dashboards
+        ports:
+            - '5601:5601'
+        environment:
+            OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+            DISABLE_SECURITY_DASHBOARDS_PLUGIN: 'true'
+        depends_on:
+            opensearch:
+                condition: service_healthy
+        networks:
+            - movies-net
+
+    fluent-bit:
+        image: fluent/fluent-bit:2.2.0
+        container_name: fluent-bit
+        ports:
+            - '24224:24224/tcp'
+            - '24224:24224/udp'
+        volumes:
+            - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+            - ./fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+        restart: unless-stopped
+        depends_on:
+            opensearch:
+                condition: service_healthy
+        networks:
+            - movies-net
+
 networks:
     movies-net:
 
 volumes:
     kafka-data:
     pgdata:
+    opensearch-data:

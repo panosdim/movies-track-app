@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.deltasw</groupId>
     <artifactId>movies-track-app</artifactId>
@@ -18,7 +18,53 @@
     </modules>
     <dependencyManagement>
         <dependencies>
-            <!-- Place shared dependency versions here if needed -->
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>3.5.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>2025.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Jackson BOM -->
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.17.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- XStream -->
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>1.4.21</version>
+            </dependency>
+
+            <!-- Guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>33.4.6-jre</version>
+            </dependency>
+
+            <!-- Http Client -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.14</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

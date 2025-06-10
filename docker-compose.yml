@@ -2,6 +2,7 @@ services:
     broker:
         image: apache/kafka-native:4.0.0
         container_name: broker
+        user: root
         ports:
             - '9092:9092'
             - '29092:29092'

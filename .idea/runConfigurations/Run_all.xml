@@ -5,6 +5,7 @@
     <toRun name="Run Eureka" type="Application" />
     <toRun name="Run Gateway" type="Application" />
     <toRun name="Run Movie Service" type="Application" />
+    <toRun name="Run Notification Service" type="Application" />
     <toRun name="Run TMDb Service" type="Application" />
     <method v="2" />
   </configuration>

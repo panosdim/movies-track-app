@@ -11,5 +11,6 @@ public class WatchlistResponse {
     private Integer movieId;
     private String title;
     private String poster;
+    private Double userScore;
     private WatchProvidersDto watchInfo;
 }

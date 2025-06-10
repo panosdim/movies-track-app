@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import info.movito.themoviedbapi.tools.appendtoresponse.MovieAppendToResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -95,8 +96,19 @@ public class TMDbController {
 
             var results = repository.findByMovieIdIn(movieIds);
             List<WatchInfoResponse> watchInfoResponse = results.stream()
-                    .map(movie -> new WatchInfoResponse(movie.getMovieId(), watchProvidersMapperService.convertToDto(
-                            movie.getWatchProviders())))
+                    .map(movie -> {
+                        var userScore = 0.0;
+                        try {
+                            // Get user score from TMDb API
+                            var movieInfo = tmdb.getMovies().getDetails(movie.getMovieId(), "en", (MovieAppendToResponse) null);
+                            // Return a map with movie ID and vote average
+                            userScore = movieInfo.getVoteAverage();
+                        } catch (Exception e) {
+                            log.warn("Error fetching score for movie {}: {}", movie.getMovieId(), e.getMessage());
+                        }
+                        return new WatchInfoResponse(movie.getMovieId(), userScore, watchProvidersMapperService.convertToDto(
+                            movie.getWatchProviders()));
+                    })
                     .collect(Collectors.toList());
             return ResponseEntity.ok(watchInfoResponse);
         } catch (Exception e) {

@@ -76,7 +76,7 @@ public class MovieController {
 
         log.info("Fetching watch info for movies: {}", movieIds);
         if (movieIds.isEmpty()) {
-            return ResponseEntity.ok(movies); // Return empty response
+            return ResponseEntity.ok(movies); // Return an empty response
         }
 
         List<WatchInfoResponse> watchInfoResponse;
@@ -91,6 +91,7 @@ public class MovieController {
                             movie.getMovieId(),
                             movie.getTitle(),
                             movie.getPoster(),
+                            0.0,
                             null)) // No watch info available
                     .toList();
             return ResponseEntity.ok(response); // Return movies without watch info data
@@ -99,17 +100,16 @@ public class MovieController {
         List<WatchlistResponse> watchlistResponse = new ArrayList<>();
 
         // Combine the watch info and movies to MovieResponse
-        watchInfoResponse.forEach(info -> {
-            movies.stream()
-                    .filter(movie -> movie.getMovieId().equals(info.getMovieId()))
-                    .findFirst()
-                    .ifPresent(movie -> watchlistResponse.add(new WatchlistResponse(
-                            movie.getId(),
-                            movie.getMovieId(),
-                            movie.getTitle(),
-                            movie.getPoster(),
-                            info.getWatchProviders())));
-        });
+        watchInfoResponse.forEach(info -> movies.stream()
+                .filter(movie -> movie.getMovieId().equals(info.getMovieId()))
+                .findFirst()
+                .ifPresent(movie -> watchlistResponse.add(new WatchlistResponse(
+                        movie.getId(),
+                        movie.getMovieId(),
+                        movie.getTitle(),
+                        movie.getPoster(),
+                        info.getUserScore(),
+                        info.getWatchProviders()))));
 
         return ResponseEntity.ok(watchlistResponse);
     }

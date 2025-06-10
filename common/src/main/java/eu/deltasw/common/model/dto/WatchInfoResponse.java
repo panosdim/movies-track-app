@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WatchInfoResponse {
     private Integer movieId;
+    private Double userScore;
     private WatchProvidersDto watchProviders;
 }

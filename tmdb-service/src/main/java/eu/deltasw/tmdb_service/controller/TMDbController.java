@@ -45,7 +45,7 @@ public class TMDbController {
         try {
             return ResponseEntity.ok(tmdb.getDiscover().getMovie(discoverMovieParamBuilder));
         } catch (TmdbException e) {
-            log.warn("Cannot communicate with TMDb API");
+            log.warn("Cannot communicate with TMDb API {}", e.getMessage());
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot communicate with TMDb API"));
         }
     }
@@ -55,7 +55,7 @@ public class TMDbController {
         try {
             return ResponseEntity.ok(tmdb.getSearch().searchMovie(term.getTerm(), false, null, null, null, null, null));
         } catch (TmdbException e) {
-            log.warn("Cannot communicate with TMDb API");
+            log.warn("Cannot communicate with TMDb API {}", e.getMessage());
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot communicate with TMDb API"));
         }
     }
@@ -74,7 +74,7 @@ public class TMDbController {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(response);
         } catch (TmdbException e) {
-            log.warn("Cannot communicate with TMDb API");
+            log.warn("Cannot communicate with TMDb API {}", e.getMessage());
             return ResponseEntity.badRequest().body(new ErrorResponse("Cannot communicate with TMDb API"));
         }
     }
@@ -98,7 +98,7 @@ public class TMDbController {
                             // Return a map with movie ID and vote average
                             userScore = movieInfo.getVoteAverage();
                         } catch (TmdbException e) {
-                            log.warn("Error fetching score for movie {}: {}", movie.getMovieId(), e.toString());
+                            log.warn("Error fetching score for movie {}: {}", movie.getMovieId(), e.getMessage());
                         }
                         return new WatchInfoResponse(movie.getMovieId(), userScore, watchProvidersMapperService.convertToDto(
                                 movie.getWatchProviders()));
@@ -106,7 +106,7 @@ public class TMDbController {
                     .collect(Collectors.toList());
             return ResponseEntity.ok(watchInfoResponse);
         } catch (Exception e) {
-            log.warn("Database error: {}", e.toString());
+            log.warn("General error: {}", e.toString());
             return ResponseEntity.badRequest().body(new ErrorResponse("Database error"));
         }
     }

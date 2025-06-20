@@ -7,6 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import asynccontextmanager
 
+import fluent.handler
 import numpy as np
 import schedule
 import uvicorn as uvicorn
@@ -25,7 +26,7 @@ from tmdb import fetch_movie_details, fetch_new_releases
 _uvicorn_logger = logging.getLogger("uvicorn")
 _uvicorn_logger.propagate = False
 
-logging.config.fileConfig(fname="logging.conf", disable_existing_loggers=False)
+# Get logger for this module
 _logger = logging.getLogger(__name__)
 
 
@@ -491,7 +492,75 @@ async def lifespan(_app: FastAPI):
     # Initialize components
     global kafka_consumer
 
-    profile = os.getenv("APP_PROFILE", "default")
+    # Configure logging based on environment
+    profile = os.getenv("APP_PROFILE", "docker")
+
+    # Configure fluent logging
+    if profile == "local":
+        fluent_host = "localhost"
+    else:
+        fluent_host = "fluent-bit"
+
+    # Setup console handler for all environments
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    console_handler.setFormatter(console_formatter)
+
+    # Setup handlers list with console handler
+    handlers: list[logging.Handler] = [console_handler]
+
+    # Try to set up fluent handler with error handling
+    try:
+        fluent_handler = fluent.handler.FluentHandler(
+            "movies-track.recommendation-service",
+            host=fluent_host,
+            port=24224,
+            timeout=3.0,  # Add timeout
+            retry_limit=3,  # Add retry limit
+            wait_on_retry=True,  # Wait between retries
+        )
+        fluent_handler.setLevel(logging.INFO)
+
+        # Add custom formatter for fluent logs
+        fluent_formatter = fluent.handler.FluentRecordFormatter(
+            {
+                "level": "%(level)s",
+                "message": "%(message)s",
+                "service": "%(service)s",
+                "component": "%(component)s",
+                "environment": "%(environment)s",
+            }
+        )
+        fluent_handler.setFormatter(fluent_formatter)
+
+        # Add additional fields to fluent logs
+        def add_fluent_fields(record):
+            record.service = "recommendation"
+            record.component = "recommendation-service"
+            record.environment = "local" if profile == "local" else "docker"
+            record.level = record.levelname
+            return True
+
+        fluent_handler.addFilter(add_fluent_fields)
+
+        # Add fluent handler to handlers list
+        handlers.append(fluent_handler)
+        print(f"Fluent logging configured with host: {fluent_host}")
+    except Exception as e:
+        print(f"Warning: Could not configure fluent logging: {e}")
+
+    # Configure root logger with all available handlers
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=handlers,
+    )
+
+    # Get logger for this module
+    _logger = logging.getLogger(__name__)
+    _logger.info(f"Logging initialized in {profile} mode with {len(handlers)} handlers")
 
     eureka_url = (
         "http://localhost:8761/eureka/"
@@ -601,5 +670,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     uvicorn.run(
-        "main:app", host="0.0.0.0", port=args.port, reload=False, log_level="info"
+        "main:app",
+        host="0.0.0.0",
+        port=args.port,
+        reload=False,
+        log_level="info",
+        log_config=None,
     )

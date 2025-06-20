@@ -1,6 +1,24 @@
 {
     "configurations": [
         {
+            "name": "recommendation-service",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/recommendation-service/src",
+            "module": "uvicorn",
+            "args": [
+                "main:app",
+                "--reload",
+                "--port",
+                "8005",
+            ],
+            "jinja": true,
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "APP_PROFILE": "local"
+            },
+        },
+        {
             "type": "java",
             "name": "auth-service",
             "request": "launch",

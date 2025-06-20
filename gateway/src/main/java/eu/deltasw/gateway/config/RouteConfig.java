@@ -14,9 +14,8 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableDiscoveryClient
 public class RouteConfig {
-    @SuppressWarnings("null")
-    @Bean
-    RouteLocator routes(RouteLocatorBuilder builder) {
+        @Bean
+        RouteLocator routes(RouteLocatorBuilder builder) {
                 return builder.routes()
                                 // Endpoints for auth-service
                                 .route("auth_service", r -> r.path("/login", "/register")
@@ -26,23 +25,11 @@ public class RouteConfig {
                                 .route("tmdb_service",
                                                 r -> r.path("/popular", "/search", "/autocomplete")
                                                                 .uri("lb://tmdb-service"))
-                                // /watch-info only available in 'local' profile
-                                .route("tmdb_service_watch_info_local",
-                                                r -> r.path("/watch-info")
-                                                                .and()
-                                                                .predicate(exchange -> {
-                                                                        String[] profiles = exchange
-                                                                                        .getApplicationContext()
-                                                                                        .getEnvironment()
-                                                                                        .getActiveProfiles();
-                                                                        for (String profile : profiles) {
-                                                                                if ("local".equals(profile)) {
-                                                                                        return true;
-                                                                                }
-                                                                        }
-                                                                        return false;
-                                                                })
-                                                                .uri("lb://tmdb-service"))
+
+                                // Endpoints for recommendation-service
+                                .route("recommendation_service",
+                                                r -> r.path("/suggestion")
+                                                                .uri("lb://recommendation-service"))
 
                                 // Endpoints for movie-service
                                 .route("movie_service", r -> r.path("/movies/**")
@@ -50,8 +37,8 @@ public class RouteConfig {
                                 .build();
         }
 
-    @Bean
-    CorsWebFilter corsWebFilter() {
+        @Bean
+        CorsWebFilter corsWebFilter() {
                 CorsConfiguration corsConfig = new CorsConfiguration();
                 corsConfig.setAllowedOriginPatterns(List.of("*"));
                 corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

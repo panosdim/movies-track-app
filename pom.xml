@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.deltasw</groupId>
     <artifactId>movies-track-app</artifactId>
@@ -11,7 +11,6 @@
         <module>auth-service</module>
         <module>movie-service</module>
         <module>tmdb-service</module>
-        <module>config-server</module>
         <module>eureka</module>
         <module>gateway</module>
         <module>notification-service</module>
@@ -22,7 +21,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

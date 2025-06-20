@@ -5,6 +5,7 @@
       <w>postgre</w>
       <w>tmdb</w>
       <w>watchlists</w>
+      <w>watchproviders</w>
     </words>
   </dictionary>
 </component>

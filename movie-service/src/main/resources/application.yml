@@ -4,16 +4,16 @@ spring:
     application:
         name: movie-service
     datasource:
-        url: ${DB_URL}
-        username: ${POSTGRES_USER}
-        password: ${POSTGRES_PASSWORD}
+        url: jdbc:postgresql://postgresql:5432/moviedb
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
         driver-class-name: org.postgresql.Driver
     jpa:
         hibernate:
             ddl-auto: update
         show-sql: true
     kafka:
-        bootstrap-servers: ${KAFKA_BROKERS}
+        bootstrap-servers: broker:29092
         producer:
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

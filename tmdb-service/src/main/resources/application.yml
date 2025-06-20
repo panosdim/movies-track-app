@@ -4,16 +4,16 @@ spring:
     application:
         name: tmdb-service
     datasource:
-        url: ${DB_URL}
-        username: ${POSTGRES_USER}
-        password: ${POSTGRES_PASSWORD}
+        url: jdbc:postgresql://postgresql:5432/tmdbdb
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
         driver-class-name: org.postgresql.Driver
     jpa:
         hibernate:
             ddl-auto: update
         show-sql: true
     kafka:
-        bootstrap-servers: ${KAFKA_BROKERS}
+        bootstrap-servers: broker:29092
         consumer:
             group-id: tmdb-movie-event-consumers
             key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -51,7 +51,7 @@ tmdb:
 
 watchproviders:
     update:
-        cron: 0 * * * * ? # Every minute
+        cron: 0 0 0 * * ? # Every day at midnight
 
 ---
 spring:
@@ -74,3 +74,6 @@ management:
     zipkin:
         tracing:
             endpoint: http://localhost:9411/api/v2/spans
+watchproviders:
+    update:
+        cron: 0 * * * * ? # Every minute

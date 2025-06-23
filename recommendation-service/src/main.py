@@ -1,4 +1,5 @@
 import argparse
+import base64
 import glob
 import logging.config
 import os
@@ -6,28 +7,34 @@ import queue
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import asynccontextmanager
+from typing import Optional
 
 import fluent.handler
 import numpy as np
 import schedule
 import uvicorn as uvicorn
 from database import get_movie_ids, get_movie_ratings
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from jose import JWTError, jwt
 from kafka_consumer import KafkaMovieEventConsumer
-from models import MovieEvent, SuggestionsRequest
+from models import MovieEvent
 from preprocess import preprocess_movie_data
 from py_eureka_client import eureka_client
 from recommendation_model import build_model, train_model
 from tensorflow.keras.models import Model, load_model  # type: ignore
 from tmdb import fetch_movie_details, fetch_new_releases
 
-_uvicorn_logger = logging.getLogger("uvicorn")
-_uvicorn_logger.propagate = False
-
 # Get logger for this module
 _logger = logging.getLogger(__name__)
+
+# JWT Configuration
+JWT_SECRET_FROM_ENV = os.getenv("JWT_SECRET")
+if not JWT_SECRET_FROM_ENV:
+    raise ValueError("JWT_SECRET environment variable must be set")
+JWT_SECRET_KEY = base64.b64decode(JWT_SECRET_FROM_ENV)
+ALGORITHM = "HS256"
 
 
 # Models directory configuration
@@ -88,6 +95,48 @@ training_executor = ThreadPoolExecutor(max_workers=1)  # Only one training at a 
 
 # Scheduler executor
 scheduler_executor = ThreadPoolExecutor(max_workers=1)
+
+
+async def get_current_user_id(authorization: Optional[str] = Header(None)) -> str:
+    """
+    Dependency to get user ID from JWT token in Authorization header.
+    """
+    if authorization is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    parts = authorization.split()
+
+    if parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication scheme",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif len(parts) == 1 or len(parts) > 2:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = parts[1]
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: Optional[str] = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    return user_id
 
 
 def get_model_path(user_id: str) -> str:
@@ -624,22 +673,24 @@ def health():
 
 @app.get("/info")
 def info():
-    return {"service": "recommendation-service", "version": "1.0.0"}
+    return {"service": "recommendation-service", "version": "2.0"}
 
 
-@app.post("/suggestion")
-async def suggestion(request: SuggestionsRequest):
+@app.get("/suggestion")
+async def suggestion(
+    numOfMovies: int = 20, user_id: str = Depends(get_current_user_id)
+):
     # Check cache first
-    cached_suggestions = get_suggestions_cache(request.userId)
+    cached_suggestions = get_suggestions_cache(user_id)
     if cached_suggestions is not None:
-        _logger.info(f"Returning cached suggestions for user: {request.userId}")
+        _logger.info(f"Returning cached suggestions for user: {user_id}")
         return JSONResponse(
             status_code=200, content=jsonable_encoder(cached_suggestions)
         )
 
     # If not in cache, compute suggestions
-    _logger.info(f"Computing suggestions for user: {request.userId} (not in cache)")
-    suggestions_list = compute_user_suggestions(request.userId)
+    _logger.info(f"Computing suggestions for user: {user_id} (not in cache)")
+    suggestions_list = compute_user_suggestions(user_id)
 
     if not suggestions_list:
         return JSONResponse(
@@ -647,13 +698,13 @@ async def suggestion(request: SuggestionsRequest):
             content=jsonable_encoder(
                 {
                     "status": "error",
-                    "message": f"No suggestions available for user {request.userId}. Please ensure the model is trained.",
+                    "message": f"No suggestions available for user {user_id}. Please ensure the model is trained.",
                 }
             ),
         )
 
     # Cache the computed suggestions
-    set_suggestions_cache(request.userId, suggestions_list)
+    set_suggestions_cache(user_id, suggestions_list)
 
     return JSONResponse(status_code=200, content=jsonable_encoder(suggestions_list))
 

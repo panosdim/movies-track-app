@@ -8,7 +8,3 @@ class MovieEvent(BaseModel):
     userId: str
     movieId: int
     rating: int | None = None
-
-
-class SuggestionsRequest(BaseModel):
-    userId: str

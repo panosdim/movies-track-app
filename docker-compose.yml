@@ -210,7 +210,7 @@ services:
         ports:
             - '8005:8005'
         volumes:
-            - models-data:/app/models
+            - ./models:/app/models
         env_file:
             - .env
         depends_on:
@@ -240,4 +240,3 @@ volumes:
     kafka-data:
     pgdata:
     opensearch-data:
-    models-data:

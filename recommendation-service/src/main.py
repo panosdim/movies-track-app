@@ -1,6 +1,7 @@
 import argparse
 import base64
 import glob
+import json
 import logging.config
 import os
 import queue
@@ -19,12 +20,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from jose import JWTError, jwt
 from kafka_consumer import KafkaMovieEventConsumer
-from models import MovieEvent
 from preprocess import preprocess_movie_data
 from py_eureka_client import eureka_client
 from recommendation_model import build_model, train_model
 from tensorflow.keras.models import Model, load_model  # type: ignore
 from tmdb import fetch_movie_details, fetch_new_releases
+
+from models import MovieEvent
 
 # Get logger for this module
 _logger = logging.getLogger(__name__)
@@ -144,6 +146,42 @@ def get_model_path(user_id: str) -> str:
     return os.path.join(MODELS_DIR, f"{user_id}.keras")
 
 
+def get_model_metadata_path(user_id: str) -> str:
+    """Get the full path for a user's model metadata file."""
+    return os.path.join(MODELS_DIR, f"{user_id}_metadata.json")
+
+
+def save_model_metadata(user_id: str, metadata: dict):
+    """Saves model metadata to a file."""
+    metadata_path = get_model_metadata_path(user_id)
+    try:
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f)
+        _logger.info(f"Saved model metadata for user {user_id} to {metadata_path}")
+    except Exception as e:
+        _logger.error(f"Failed to save model metadata for user {user_id}: {e}")
+
+
+def load_model_metadata(user_id: str) -> dict | None:
+    """Loads model metadata from a file."""
+    metadata_path = get_model_metadata_path(user_id)
+    try:
+        with open(metadata_path, "r") as f:
+            metadata = json.load(f)
+            _logger.info(
+                f"Loaded model metadata for user {user_id} from {metadata_path}"
+            )
+            return metadata
+    except FileNotFoundError:
+        _logger.warning(
+            f"Metadata file not found for user {user_id} at {metadata_path}"
+        )
+        return None
+    except Exception as e:
+        _logger.error(f"Failed to load model metadata for user {user_id}: {e}")
+        return None
+
+
 def get_all_user_ids() -> list[str]:
     """Get all user IDs by checking existing keras model files"""
     try:
@@ -255,18 +293,25 @@ def compute_user_suggestions(user_id: str) -> list:
     try:
         _logger.info(f"Computing suggestions for user: {user_id}")
 
-        # Load user's model
+        # Load user's model and metadata
         try:
             model_path = get_model_path(user_id)
             user_model = load_model(model_path)
+            model_metadata = load_model_metadata(user_id)
+            if not model_metadata:
+                _logger.error(
+                    f"Metadata not found for user {user_id}, cannot compute suggestions."
+                )
+                return []
         except Exception as e:
-            _logger.error(f"Failed to load model for user {user_id}: {e}")
+            _logger.error(f"Failed to load model or metadata for user {user_id}: {e}")
             return []
 
-        # Get user-specific data
-        user_genre_list, user_actor_list, user_director_list, user_num_movies = (
-            populate_lists(user_id)
-        )
+        # Get user-specific data from loaded metadata
+        user_genre_list = model_metadata["genre_list"]
+        user_actor_list = model_metadata["actor_list"]
+        user_director_list = model_metadata["director_list"]
+        user_num_movies = model_metadata["num_movies"]
 
         # Fetch new movie ids
         releases_1 = fetch_new_releases(1) or []
@@ -479,6 +524,15 @@ def _execute_training(event_data: dict):
         model_path = get_model_path(user_id)
         new_model.save(model_path)
 
+        # Save model metadata
+        metadata = {
+            "genre_list": genre_list,
+            "actor_list": actor_list,
+            "director_list": director_list,
+            "num_movies": num_movies,
+        }
+        save_model_metadata(user_id, metadata)
+
         _logger.info(f"Training completed successfully for user: {user_id}")
 
         # Compute suggestions immediately after training
@@ -680,15 +734,54 @@ def info():
 async def suggestion(
     numOfMovies: int = 20, user_id: str = Depends(get_current_user_id)
 ):
-    # Check cache first
+    # Check if a model exists for the user. If not, provide generic suggestions.
+    model_path = get_model_path(user_id)
+    if not os.path.exists(model_path):
+        _logger.info(
+            f"No model found for user {user_id}. Returning generic new releases."
+        )
+        try:
+            # Fetch new releases as a fallback
+            releases_1 = fetch_new_releases(1) or []
+            releases_2 = fetch_new_releases(2) or []
+            new_releases = releases_1 + releases_2
+
+            # Filter out movies that are already in the user's watchlist
+            watchlist_movie_ids = get_movie_ids(user_id)
+            filtered_movies = [
+                movie
+                for movie in new_releases
+                if movie["id"] not in watchlist_movie_ids
+            ]
+
+            return JSONResponse(
+                status_code=200,
+                content=jsonable_encoder(filtered_movies[:numOfMovies]),
+            )
+        except Exception as e:
+            _logger.error(
+                f"Failed to fetch generic suggestions for user {user_id}: {e}"
+            )
+            return JSONResponse(
+                status_code=500,
+                content=jsonable_encoder(
+                    {
+                        "status": "error",
+                        "message": "Could not fetch generic suggestions.",
+                    }
+                ),
+            )
+
+    # Check cache first for personalized suggestions
     cached_suggestions = get_suggestions_cache(user_id)
     if cached_suggestions is not None:
         _logger.info(f"Returning cached suggestions for user: {user_id}")
         return JSONResponse(
-            status_code=200, content=jsonable_encoder(cached_suggestions)
+            status_code=200,
+            content=jsonable_encoder(cached_suggestions[:numOfMovies]),
         )
 
-    # If not in cache, compute suggestions
+    # If not in cache, compute personalized suggestions
     _logger.info(f"Computing suggestions for user: {user_id} (not in cache)")
     suggestions_list = compute_user_suggestions(user_id)
 
@@ -706,7 +799,9 @@ async def suggestion(
     # Cache the computed suggestions
     set_suggestions_cache(user_id, suggestions_list)
 
-    return JSONResponse(status_code=200, content=jsonable_encoder(suggestions_list))
+    return JSONResponse(
+        status_code=200, content=jsonable_encoder(suggestions_list[:numOfMovies])
+    )
 
 
 if __name__ == "__main__":

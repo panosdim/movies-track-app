@@ -9,10 +9,12 @@ import org.springframework.data.repository.query.Param;
 import eu.deltasw.movie_service.model.Movie;
 
 public interface MovieRepository extends JpaRepository<Movie, Long> {
-    List<Movie> findByUserIdAndWatchedIsFalseOrWatchedIsNull(String userId);
+    @Query("SELECT m FROM Movie m WHERE m.userId = :userId AND (m.watched = false OR m.watched IS NULL)")
+    List<Movie> findByUserIdAndWatchedIsFalseOrWatchedIsNull(@Param("userId") String userId);
 
     @Query("SELECT m FROM Movie m WHERE m.movieId = :movieId AND (m.watched = false OR m.watched IS NULL)")
     List<Movie> findUnwatchedByMovieId(@Param("movieId") Integer movieId);
 
-    List<Movie> findByUserIdAndWatchedIsTrue(String userId);
+    @Query("SELECT m FROM Movie m WHERE m.userId = :userId AND m.watched = true")
+    List<Movie> findByUserIdAndWatchedIsTrue(@Param("userId") String userId);
 }

@@ -98,6 +98,7 @@ public class MovieController {
         }
 
         List<WatchlistResponse> watchlistResponse = new ArrayList<>();
+        log.info("Watch info response: {}", watchInfoResponse);
 
         // Combine the watch info and movies to MovieResponse
         watchInfoResponse.forEach(info -> movies.stream()

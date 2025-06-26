@@ -100,6 +100,20 @@ public class MovieController {
         List<WatchlistResponse> watchlistResponse = new ArrayList<>();
         log.info("Watch info response: {}", watchInfoResponse);
 
+        if (watchInfoResponse.isEmpty()) {
+            // If we got an empty watch info response, return all movies with null watch
+            // info
+            return ResponseEntity.ok(movies.stream()
+                    .map(movie -> new WatchlistResponse(
+                            movie.getId(),
+                            movie.getMovieId(),
+                            movie.getTitle(),
+                            movie.getPoster(),
+                            0.0,
+                            null)) // No watch info available
+                    .toList());
+        }
+
         // Combine the watch info and movies to MovieResponse
         watchInfoResponse.forEach(info -> movies.stream()
                 .filter(movie -> movie.getMovieId().equals(info.getMovieId()))
@@ -111,6 +125,18 @@ public class MovieController {
                         movie.getPoster(),
                         info.getUserScore(),
                         info.getWatchProviders()))));
+
+        // Add remaining movies without watch info
+        movies.stream()
+                .filter(movie -> watchlistResponse.stream()
+                        .noneMatch(response -> response.getMovieId().equals(movie.getMovieId())))
+                .forEach(movie -> watchlistResponse.add(new WatchlistResponse(
+                        movie.getId(),
+                        movie.getMovieId(),
+                        movie.getTitle(),
+                        movie.getPoster(),
+                        0.0,
+                        null)));
 
         return ResponseEntity.ok(watchlistResponse);
     }

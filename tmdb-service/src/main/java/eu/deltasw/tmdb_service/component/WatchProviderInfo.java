@@ -11,6 +11,7 @@ import eu.deltasw.tmdb_service.repository.MovieRepository;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 import info.movito.themoviedbapi.tools.TmdbException;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -29,6 +30,11 @@ public class WatchProviderInfo {
 
     @Value("${watchproviders.update.cron}")
     private String updateCron;
+
+    @PostConstruct
+    public void init() {
+        log.info("Scheduling watch provider updates with cron: {}", updateCron);
+    }
 
     @Scheduled(cron = "${watchproviders.update.cron}")
     public void updateWatchProvidersInfo() {

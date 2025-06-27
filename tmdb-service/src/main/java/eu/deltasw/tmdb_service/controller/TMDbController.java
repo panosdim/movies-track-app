@@ -1,5 +1,16 @@
 package eu.deltasw.tmdb_service.controller;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import eu.deltasw.common.model.dto.WatchInfoRequest;
 import eu.deltasw.common.model.dto.WatchInfoResponse;
 import eu.deltasw.tmdb_service.model.dto.ErrorResponse;
@@ -12,12 +23,6 @@ import info.movito.themoviedbapi.tools.builders.discover.DiscoverMovieParamBuild
 import info.movito.themoviedbapi.tools.sortby.DiscoverMovieSortBy;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -29,7 +34,7 @@ public class TMDbController {
     private final WatchProvidersMapperService watchProvidersMapperService;
 
     public TMDbController(TmdbApi tmdb, MovieRepository repository,
-                          WatchProvidersMapperService watchProvidersMapperService) {
+            WatchProvidersMapperService watchProvidersMapperService) {
         this.tmdb = tmdb;
         this.repository = repository;
         this.watchProvidersMapperService = watchProvidersMapperService;
@@ -91,7 +96,7 @@ public class TMDbController {
             var results = repository.findByMovieIdIn(movieIds);
             List<WatchInfoResponse> watchInfoResponse = results.stream()
                     .map(movie -> {
-                        var userScore = 0.0;
+                        Double userScore = null;
                         try {
                             // Get user score from TMDb API
                             var movieInfo = tmdb.getMovies().getDetails(movie.getMovieId(), "en", null);
@@ -100,8 +105,9 @@ public class TMDbController {
                         } catch (TmdbException e) {
                             log.warn("Error fetching score for movie {}: {}", movie.getMovieId(), e.getMessage());
                         }
-                        return new WatchInfoResponse(movie.getMovieId(), userScore, watchProvidersMapperService.convertToDto(
-                                movie.getWatchProviders()));
+                        return new WatchInfoResponse(movie.getMovieId(), userScore,
+                                watchProvidersMapperService.convertToDto(
+                                        movie.getWatchProviders()));
                     })
                     .collect(Collectors.toList());
             return ResponseEntity.ok(watchInfoResponse);

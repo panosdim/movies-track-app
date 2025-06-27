@@ -91,7 +91,7 @@ public class MovieController {
                             movie.getMovieId(),
                             movie.getTitle(),
                             movie.getPoster(),
-                            0.0,
+                            null,
                             null)) // No watch info available
                     .toList();
             return ResponseEntity.ok(response); // Return movies without watch info data
@@ -109,7 +109,7 @@ public class MovieController {
                             movie.getMovieId(),
                             movie.getTitle(),
                             movie.getPoster(),
-                            0.0,
+                            null,
                             null)) // No watch info available
                     .toList());
         }
@@ -135,7 +135,7 @@ public class MovieController {
                         movie.getMovieId(),
                         movie.getTitle(),
                         movie.getPoster(),
-                        0.0,
+                        null,
                         null)));
 
         return ResponseEntity.ok(watchlistResponse);

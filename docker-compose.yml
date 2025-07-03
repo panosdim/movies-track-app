@@ -2,6 +2,7 @@ services:
     broker:
         image: apache/kafka-native:4.0.0
         container_name: broker
+        restart: unless-stopped
         user: root
         ports:
             - '9092:9092'
@@ -49,6 +50,7 @@ services:
     eureka:
         image: ghcr.io/panosdim/eureka:latest
         container_name: eureka
+        restart: unless-stopped
         ports:
             - '8761:8761'
         healthcheck:
@@ -62,6 +64,7 @@ services:
     gateway:
         image: ghcr.io/panosdim/gateway:latest
         container_name: gateway
+        restart: unless-stopped
         ports:
             - '8080:8080'
         depends_on:
@@ -73,6 +76,7 @@ services:
     auth-service:
         image: ghcr.io/panosdim/auth-service:latest
         container_name: auth-service
+        restart: unless-stopped
         env_file:
             - .env
         depends_on:
@@ -84,6 +88,7 @@ services:
     movie-service:
         image: ghcr.io/panosdim/movie-service:latest
         container_name: movie-service
+        restart: unless-stopped
         env_file:
             - .env
         depends_on:
@@ -97,6 +102,7 @@ services:
     tmdb-service:
         image: ghcr.io/panosdim/tmdb-service:latest
         container_name: tmdb-service
+        restart: unless-stopped
         env_file:
             - .env
         depends_on:
@@ -110,6 +116,7 @@ services:
     notification-service:
         image: ghcr.io/panosdim/notification-service:latest
         container_name: notification-service
+        restart: unless-stopped
         env_file:
             - .env
         depends_on:
@@ -121,6 +128,7 @@ services:
     postgresql:
         image: postgres:17-alpine
         container_name: postgresql
+        restart: unless-stopped
         env_file:
             - .env
         environment:
@@ -137,6 +145,7 @@ services:
     zipkin:
         image: openzipkin/zipkin:2.24
         container_name: zipkin
+        restart: unless-stopped
         ports:
             - '9411:9411'
         networks:
@@ -145,6 +154,7 @@ services:
     opensearch:
         image: opensearchproject/opensearch:2.11.1
         container_name: opensearch
+        restart: unless-stopped
         environment:
             - cluster.name=opensearch-cluster
             - node.name=opensearch
@@ -176,6 +186,7 @@ services:
     opensearch-dashboards:
         image: opensearchproject/opensearch-dashboards:2.11.1
         container_name: opensearch-dashboards
+        restart: unless-stopped
         ports:
             - '5601:5601'
         environment:
@@ -230,8 +241,8 @@ services:
         logging:
             driver: json-file
             options:
-                max-size: "10m"
-                max-file: "3"
+                max-size: '10m'
+                max-file: '3'
 
 networks:
     movies-net:

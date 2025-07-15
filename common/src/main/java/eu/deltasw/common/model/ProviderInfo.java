@@ -1,9 +1,9 @@
-package eu.deltasw.common.model.dto;
+package eu.deltasw.common.model;
 
 import lombok.Data;
 
 @Data
-public class ProviderDto {
+public class ProviderInfo {
     private String providerName;
     private String logoPath;
 }

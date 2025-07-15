@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import eu.deltasw.common.events.model.MovieEvent;
 import eu.deltasw.tmdb_service.model.Movie;
 import eu.deltasw.tmdb_service.repository.MovieRepository;
+import eu.deltasw.tmdb_service.service.WatchProvidersMapperService;
 import info.movito.themoviedbapi.TmdbApi;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 import info.movito.themoviedbapi.tools.TmdbException;
@@ -17,10 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 public class MovieEventsConsumer {
     private final MovieRepository repository;
     private final TmdbApi tmdb;
+    private final WatchProvidersMapperService watchProvidersMapperService;
 
-    public MovieEventsConsumer(MovieRepository repository, @Value("${tmdb.key}") String tmdbKey) {
+    public MovieEventsConsumer(MovieRepository repository, @Value("${tmdb.key}") String tmdbKey,
+            WatchProvidersMapperService watchProvidersMapperService) {
         this.repository = repository;
         tmdb = new TmdbApi(tmdbKey);
+        this.watchProvidersMapperService = watchProvidersMapperService;
     }
 
     @KafkaListener(topics = "${movie.events.topic}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "kafkaListenerContainerFactory")
@@ -41,7 +45,7 @@ public class MovieEventsConsumer {
                 try {
                     WatchProviders watchProviders = tmdb.getMovies().getWatchProviders(movie.getMovieId())
                             .getResults().get("GR");
-                    movie.setWatchProviders(watchProviders);
+                    movie.setWatchProviders(watchProvidersMapperService.convertTo(watchProviders));
                 } catch (TmdbException e) {
                     log.error("Error getting watch providers", e);
                 }

@@ -1,6 +1,6 @@
 package eu.deltasw.movie_service.model.dto;
 
-import eu.deltasw.common.model.dto.WatchProvidersDto;
+import eu.deltasw.common.model.WatchInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,5 +12,5 @@ public class WatchlistResponse {
     private String title;
     private String poster;
     private Double userScore;
-    private WatchProvidersDto watchInfo;
+    private WatchInfo watchInfo;
 }

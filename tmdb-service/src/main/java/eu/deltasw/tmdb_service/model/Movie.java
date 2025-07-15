@@ -2,7 +2,7 @@ package eu.deltasw.tmdb_service.model;
 
 import org.hibernate.annotations.Type;
 
-import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
+import eu.deltasw.common.model.WatchInfo;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,5 +28,5 @@ public class Movie {
     private Integer movieId;
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
-    private WatchProviders watchProviders;
+    private WatchInfo watchProviders;
 }

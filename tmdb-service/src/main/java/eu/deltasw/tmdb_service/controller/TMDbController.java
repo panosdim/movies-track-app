@@ -105,9 +105,7 @@ public class TMDbController {
                         } catch (TmdbException e) {
                             log.warn("Error fetching score for movie {}: {}", movie.getMovieId(), e.getMessage());
                         }
-                        return new WatchInfoResponse(movie.getMovieId(), userScore,
-                                watchProvidersMapperService.convertToDto(
-                                        movie.getWatchProviders()));
+                        return new WatchInfoResponse(movie.getMovieId(), userScore, movie.getWatchProviders());
                     })
                     .collect(Collectors.toList());
             return ResponseEntity.ok(watchInfoResponse);

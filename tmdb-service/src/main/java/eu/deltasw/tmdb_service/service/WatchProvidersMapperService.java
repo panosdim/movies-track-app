@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import eu.deltasw.common.model.dto.ProviderDto;
-import eu.deltasw.common.model.dto.WatchProvidersDto;
+import eu.deltasw.common.model.ProviderInfo;
+import eu.deltasw.common.model.WatchInfo;
 import info.movito.themoviedbapi.model.core.watchproviders.Provider;
 import info.movito.themoviedbapi.model.core.watchproviders.WatchProviders;
 
@@ -20,27 +20,37 @@ public class WatchProvidersMapperService {
         this.modelMapper = modelMapper;
     }
 
-    public ProviderDto convertToDto(Provider provider) {
-        return modelMapper.map(provider, ProviderDto.class);
+    public ProviderInfo convertTo(Provider provider) {
+        return modelMapper.map(provider, ProviderInfo.class);
     }
 
-    public WatchProvidersDto convertToDto(WatchProviders watchProviders) {
+    public WatchInfo convertTo(WatchProviders watchProviders) {
         if (watchProviders == null) {
             return null;
         }
-        WatchProvidersDto dto = new WatchProvidersDto();
+        WatchInfo dto = new WatchInfo();
 
-        dto.setRent(mapProviderList(watchProviders.getRentProviders()));
-        dto.setBuy(mapProviderList(watchProviders.getBuyProviders()));
-        dto.setFlatrate(mapProviderList(watchProviders.getFlatrateProviders()));
+        List<ProviderInfo> rentProviders = mapProviderList(watchProviders.getRentProviders());
+        if (rentProviders != null) {
+            dto.setRent(rentProviders);
+        }
+
+        List<ProviderInfo> flatrateProviders = mapProviderList(watchProviders.getFlatrateProviders());
+        if (flatrateProviders != null) {
+            dto.setFlatrate(flatrateProviders);
+        }
+
+        if (flatrateProviders == null && rentProviders == null) {
+            return null;
+        }
 
         return dto;
     }
 
-    private List<ProviderDto> mapProviderList(List<Provider> providers) {
+    private List<ProviderInfo> mapProviderList(List<Provider> providers) {
         return providers == null ? null
                 : providers.stream()
-                        .map(this::convertToDto)
+                        .map(this::convertTo)
                         .collect(Collectors.toList());
     }
 }
